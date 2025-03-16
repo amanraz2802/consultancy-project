@@ -30,7 +30,7 @@ function ReusableComponent(props) {
         <div className="flex flex-col w-20 lg:w-32 p-4 items-center justify-between min-h-screen fixed">
           <div className="w-full">
             <img
-              src="../../images/svnitLogo.png"
+              src="https://res.cloudinary.com/dpyurrpfa/image/upload/v1742117068/ry46xbwnlh1qttam6inp.png"
               alt="svnitLogoImg"
               className="w-full max-w-[80px] mx-auto"
             />

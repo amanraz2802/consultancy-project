@@ -10,7 +10,7 @@ function Loginpage() {
       justify-center items-center gap-4"
       >
         <img
-          src="../../images/svnitLogo.png"
+          src="https://res.cloudinary.com/dpyurrpfa/image/upload/v1742117068/ry46xbwnlh1qttam6inp.png"
           alt=""
           className="w-[300px] h-[300px]"
         />

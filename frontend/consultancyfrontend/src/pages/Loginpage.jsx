@@ -1,5 +1,5 @@
 import React from "react";
-import "@fontsource/poppins";
+// import "@fontsource/poppins";
 import GoogleSignInButton from "./GoogleSignInButton.jsx";
 
 function Loginpage() {

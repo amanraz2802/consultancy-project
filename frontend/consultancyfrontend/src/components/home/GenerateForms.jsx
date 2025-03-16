@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { IoMdDocument } from "react-icons/io";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
 import { apiConnector } from "../../services/apiConnectors";
-import "@fontsource/poppins";
+// import "@fontsource/poppins";
 
 function GenerateForms() {
   const { token } = useSelector((state) => state.auth);

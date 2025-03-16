@@ -1,5 +1,5 @@
 import React from "react";
-import "@fontsource/poppins"; // Defaults to 400 weight
+// import "@fontsource/poppins"; // Defaults to 400 weight
 import GenerateForms from "./GenerateForms";
 import FindForms from "./FindForms";
 

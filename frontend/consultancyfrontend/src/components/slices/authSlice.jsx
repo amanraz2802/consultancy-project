@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
-// import { useNavigate } from "react-router-dom";
-// const navigate = useNavigate();
+import { useNavigate } from "react-router-dom";
+
 const initialState = {
   // token: null,
   // email: null,
@@ -15,8 +15,11 @@ const initialState = {
   name: localStorage.getItem("name")
     ? JSON.parse(localStorage.getItem("name"))
     : null,
+  role: localStorage.getItem("role")
+    ? JSON.parse(localStorage.getItem("role"))
+    : null,
 };
-
+// const navigate = useNavigate();
 const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
@@ -30,15 +33,19 @@ const authSlice = createSlice({
     setName(state, value) {
       state.name = value.payload;
     },
+    setRole(state, value) {
+      state.role = value.payload;
+    },
     logout(state) {
       state.token = null;
       state.email = null;
       state.name = null;
       localStorage.clear();
-
+      navigate("/");
       toast.success("Logout successfully");
     },
   },
 });
-export const { setEmail, setToken, setName, logout } = authSlice.actions;
+export const { setEmail, setToken, setName, setRole, logout } =
+  authSlice.actions;
 export default authSlice.reducer;

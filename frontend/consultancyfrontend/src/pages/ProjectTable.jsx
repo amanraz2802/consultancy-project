@@ -1,48 +1,8 @@
 import React, { useState } from "react";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-const dummyData = [
-  {
-    projectID: "873498dabcd",
-    projectName: "External Civil Work",
-    dept: "Civil",
-    createBy: "keyur@coed.svnit.ac.in",
-    status: "Ongoing",
-    form: {
-      consentForm: {
-        status: "Approved",
-        email: "hod@coed.svnit.ac.in",
-        timestamp: "2024-01-15",
-      },
-      workForm: {
-        status: "Not yet created",
-        email: "pending@svnit.ac.in",
-        timestamp: "N/A",
-      },
-    },
-  },
-  {
-    projectID: "873498d2acd",
-    projectName: "External ECE Work",
-    dept: "Electronics",
-    createBy: "keyur@ece.svnit.ac.in",
-    status: "Completed",
-    form: {
-      consentForm: {
-        status: "Approved",
-        email: "hod@ece.svnit.ac.in",
-        timestamp: "2024-01-20",
-      },
-      workForm: {
-        status: "Completed",
-        email: "supervisor@ece.svnit.ac.in",
-        timestamp: "2024-01-25",
-      },
-    },
-  },
-];
 
-const ProjectTable = () => {
+const ProjectTable = ({ data }) => {
   const navigate = useNavigate();
   const [expandedRows, setExpandedRows] = useState(new Set());
 
@@ -64,9 +24,48 @@ const ProjectTable = () => {
         return "text-green-500";
       case "rejected":
         return "text-red-500";
+      case "pending":
+      case "in progress":
+        return "text-yellow-500";
+      case "submitted":
+        return "text-blue-500";
       default:
         return "text-gray-500";
     }
+  };
+
+  // Function to format timestamp if needed
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp || timestamp === "N/A") return "N/A";
+    // You can add custom formatting here if needed
+    return timestamp;
+  };
+
+  // Function to render form details
+  const renderFormDetails = (formObject, formName) => {
+    return (
+      <div className="bg-white p-4 rounded shadow-sm">
+        <div className="font-medium text-gray-700 mb-2">{formName}</div>
+        <div className="grid grid-cols-3 gap-4 text-sm">
+          <div>
+            <span className="text-gray-500">Status:</span>
+            <span className={`ml-2 ${getStatusColor(formObject.status)}`}>
+              {formObject.status}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-500">Email:</span>
+            <span className="ml-2">{formObject.email}</span>
+          </div>
+          <div>
+            <span className="text-gray-500">Date:</span>
+            <span className="ml-2">
+              {formatTimestamp(formObject.timestamp)}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -93,7 +92,7 @@ const ProjectTable = () => {
             </tr>
           </thead>
           <tbody>
-            {dummyData.map((project) => (
+            {data.map((project) => (
               <React.Fragment key={project.projectID}>
                 <tr
                   className="border-b hover:bg-gray-50 cursor-pointer transition-colors"
@@ -132,69 +131,27 @@ const ProjectTable = () => {
                   <tr>
                     <td colSpan="5" className="px-4 py-3 bg-gray-50">
                       <div className="flex flex-col space-y-4">
-                        {/* Consent Form Details */}
-                        <div className="bg-white p-4 rounded shadow-sm">
-                          <div className="font-medium text-gray-700 mb-2">
-                            Consent Form
-                          </div>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <span className="text-gray-500">Status:</span>
-                              <span className="ml-2 text-green-600">
-                                {project.form.consentForm.status}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Email:</span>
-                              <span className="ml-2">
-                                {project.form.consentForm.email}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Date:</span>
-                              <span className="ml-2">
-                                {project.form.consentForm.timestamp}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                        {/* Dynamically render all form objects */}
+                        {project.form &&
+                          typeof project.form === "object" &&
+                          Object.entries(project.form).map(
+                            ([formKey, formValue]) => {
+                              // Format the form name to be more readable
+                              const formName = formKey
+                                .replace(/([A-Z])/g, " $1") // Add space before capital letters
+                                .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
+                                .replace(/Form$/, " Form"); // Add space before "Form" if it's at the end
 
-                        {/* Work Form Details */}
-                        <div className="bg-white p-4 rounded shadow-sm">
-                          <div className="font-medium text-gray-700 mb-2">
-                            Work Form
-                          </div>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <span className="text-gray-500">Status:</span>
-                              <span className="ml-2 text-orange-500">
-                                {project.form.workForm.status}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Email:</span>
-                              <span className="ml-2">
-                                {project.form.workForm.email}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Date:</span>
-                              <span className="ml-2">
-                                {project.form.workForm.timestamp}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                              return renderFormDetails(formValue, formName);
+                            }
+                          )}
 
                         <button
                           className="self-start px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
-                          // onClick={(e) => {
-                          //   e.stopPropagation();
-                          //   console.log(
-                          //     `Navigate to project ${project.projectID}`
-                          //   );
-                          // }}
-                          onClick={() => navigate("/view/project/18")}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/view/project/${project.projectID}`);
+                          }}
                         >
                           View Project Details
                         </button>

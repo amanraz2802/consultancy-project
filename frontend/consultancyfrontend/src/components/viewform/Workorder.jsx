@@ -127,6 +127,7 @@ const WorkOrderView = () => {
                   </td>
                   <td className="px-4 py-3">
                     {/* Conditional Button */}
+                    {console.log(project.workStatus)}
                     {project.workStatus === -1 ? (
                       <td
                         className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg "

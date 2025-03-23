@@ -3,10 +3,12 @@ import { useParams } from "react-router-dom";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-
+import { useNavigate } from "react-router-dom";
 const WorkOrderFormPage = () => {
+  const navigate = useNavigate();
   const { projectId } = useParams();
   const { token } = useSelector((state) => state.auth);
+  const [fileUrl, setFileUrl] = useState("");
 
   // Manage form data using useState
   const [formData, setFormData] = useState({
@@ -14,7 +16,10 @@ const WorkOrderFormPage = () => {
     estimatedCost: "",
     file: null,
     projectId: projectId,
+    path: "",
   });
+
+  //to upload files on cloudinary
 
   // Handle input changes
   const handleChange = (e) => {
@@ -42,32 +47,74 @@ const WorkOrderFormPage = () => {
       formData.estimatedCost,
       formData.file
     );
-    // Send data to backend
+
+    if (!formData.file) {
+      toast.error("Please select a file to upload.");
+      return;
+    }
+
+    const fileFormData = new FormData();
+    fileFormData.append("file", formData.file);
+    fileFormData.append("resource_type", "raw");
+    fileFormData.append(
+      "upload_preset",
+      import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+    );
+    fileFormData.append("folder", import.meta.env.VITE_CLOUDINARY_FOLDER); // Optional: specify folder
+
     try {
-      const response = await apiConnector(
-        "POST",
-        "/form/workForm",
+      // Upload file to Cloudinary
+      const fileResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/${
+          import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+        }/raw/upload`,
         {
-          projectId: formData.projectId.toString(),
-          description: formData.description.toString(),
-          estimatedCost: formData.estimatedCost.toString(),
-          path: formData.file ? formData.file.name : "", // Send file name
-        },
-        { draft: "false", Authorization: `Bearer ${token}` }
+          method: "POST",
+          body: fileFormData,
+        }
       );
-      toast.success(response.data.message);
-      setFormData({
-        description: "",
-        estimatedCost: "",
-        file: null,
-        projectId: projectId,
-      });
-      // const result = await response.json();
-      // console.log("Work document created successfully", result);
+
+      const fileData = await fileResponse.json();
+      console.log("Cloudinary Response:", fileData);
+
+      if (fileData.secure_url) {
+        toast.success("File uploaded successfully!");
+
+        // Update formData with the Cloudinary file URL
+        const updatedFormData = {
+          ...formData,
+          path: fileData.secure_url, // Attach secure URL
+        };
+
+        // Send the updated formData to the backend
+        const response = await apiConnector(
+          "POST",
+          "/form/workForm",
+          {
+            projectId: updatedFormData.projectId.toString(),
+            description: updatedFormData.description.toString(),
+            estimatedCost: updatedFormData.estimatedCost.toString(),
+            path: updatedFormData.path, // Send secure URL
+          },
+          { draft: "false", Authorization: `Bearer ${token}` }
+        );
+        navigate("/work-order");
+        toast.success(response.data.message);
+
+        // Reset form fields
+        setFormData({
+          description: "",
+          estimatedCost: "",
+          file: null,
+          projectId: projectId,
+          path: "",
+        });
+      } else {
+        toast.error("Upload failed.");
+      }
     } catch (error) {
-      toast.error(error.response.data.error);
-      // console.log(error.response);
-      console.error("Error creating work document:", error);
+      console.error("Error uploading file:", error);
+      toast.error("File upload failed.");
     }
   };
 

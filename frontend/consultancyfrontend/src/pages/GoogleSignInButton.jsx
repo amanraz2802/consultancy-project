@@ -20,7 +20,7 @@ function GoogleSignInButton() {
     try {
       // console.log(token);
       const response = await authenticateWithGoogle(token);
-      console.log(response);
+      console.log(response, "here");
       // console.log(response.data.token);
 
       // Store in localStorage
@@ -28,11 +28,13 @@ function GoogleSignInButton() {
       localStorage.setItem("token", JSON.stringify(token));
       localStorage.setItem("email", JSON.stringify(response.data.data.email));
       localStorage.setItem("name", JSON.stringify(response.data.data.name));
+      localStorage.setItem("role", JSON.stringify(response.data.data.role));
 
       // Update Redux state
       dispatch(setToken(token));
       dispatch(setEmail(response.data.data.email));
       dispatch(setName(response.data.data.name));
+      dispatch(setName(response.data.data.role));
       if (response.data.data.email) {
         navigate("/");
         toast.success(response.data.message);

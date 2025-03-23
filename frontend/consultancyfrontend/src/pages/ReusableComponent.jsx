@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaCircleUser } from "react-icons/fa6";
 import { HiOutlineDownload } from "react-icons/hi";
 import { MdNotifications } from "react-icons/md";
@@ -10,13 +10,32 @@ import { logout } from "../components/slices/authSlice.jsx";
 import { IoHome } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { apiConnector } from "../services/apiConnectors.jsx";
+import { useSelector } from "react-redux";
+import { MdContactMail, MdReportProblem } from "react-icons/md";
+// import { useNavigate } from "react-router-dom";
 
 function ReusableComponent(props) {
+  const { token } = useSelector((state) => state.auth);
   const { formname } = useParams();
-
+  const [totalNotification, setTotalNotification] = useState(0);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  useEffect(() => {
+    async function fetchNotificationCount() {
+      const response = await apiConnector(
+        "GET",
+        `user/notifications/unread`,
+        {},
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      console.log(response);
+      setTotalNotification(response.data.total);
+    }
+    fetchNotificationCount();
+  }, []);
   function formatText(input) {
     return input
       .replace(/([A-Z])/g, " $1") // Insert space before uppercase letters
@@ -37,8 +56,30 @@ function ReusableComponent(props) {
           </div>
 
           <div className="flex flex-col gap-6">
-            <div className="rounded-xl bg-[#1f2048] p-2">
-              <MdNotifications className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+            <div className="rounded-xl bg-[#1f2048] p-2 relative">
+              {totalNotification !== 0 && (
+                <>
+                  <MdNotifications
+                    className="w-6 h-6 lg:w-8 lg:h-8 text-white"
+                    onClick={() => {
+                      navigate("/notification");
+                    }}
+                  />
+                  <div className="rounded-full bg-red-600 flex items-center justify-center text-xl font-bold h-7 w-7 text-white absolute -top-3 -right-3">
+                    {totalNotification}
+                  </div>
+                </>
+              )}
+              {totalNotification === 0 && (
+                <>
+                  <MdNotifications
+                    className="w-6 h-6 lg:w-8 lg:h-8 text-white"
+                    onClick={() => {
+                      navigate("/notification");
+                    }}
+                  />
+                </>
+              )}
             </div>
             <div className="rounded-xl bg-[#1f2048] p-2">
               <HiOutlineDownload className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
@@ -48,6 +89,18 @@ function ReusableComponent(props) {
               onClick={() => navigate("/")}
             >
               <IoHome className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+            </div>
+            <div
+              className="rounded-xl bg-[#1f2048] p-2 "
+              onClick={() => navigate("/contact-us")}
+            >
+              <MdContactMail className="w-6 h-6 lg:w-8 lg:h-8 text-white p-1" />
+            </div>
+            <div
+              className="rounded-xl bg-[#1f2048] p-2 "
+              onClick={() => navigate("/complaint-form")}
+            >
+              <MdReportProblem className="w-6 h-6 lg:w-8 lg:h-8 text-white p-1" />
             </div>
           </div>
 
@@ -63,7 +116,10 @@ function ReusableComponent(props) {
 
                 <li
                   className="flex gap-2 p-2 rounded text-sm lg:text-base items-center"
-                  onClick={() => dispatch(logout())}
+                  onClick={() => {
+                    dispatch(logout());
+                    navigate("/");
+                  }}
                 >
                   <LuLogOut className="w-5 h-5" />
                   Logout

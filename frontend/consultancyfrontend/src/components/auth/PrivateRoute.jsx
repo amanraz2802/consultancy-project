@@ -1,15 +1,16 @@
-// This will prevent authenticated users from accessing this route
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
-function OpenRoute({ children }) {
+function PrivateRoute({ children }) {
   const { token, role } = useSelector((state) => state.auth);
 
-  if (token !== null && role == "PI") {
+  if (token !== null && role === "ADMIN") {
     return children;
   } else {
+    toast.error("Not authorized as admin");
     return <Navigate to="/login" />;
   }
 }
 
-export default OpenRoute;
+export default PrivateRoute;

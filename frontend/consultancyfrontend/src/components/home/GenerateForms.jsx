@@ -13,7 +13,7 @@ function GenerateForms() {
   const [forms, setForms] = useState({});
   const data = [
     { name: "Consent Forms", addPath: "/consent-form" },
-    { name: "Work Orders", addPath: "/workOrder" },
+    { name: "Work Orders", addPath: "/work-order" },
     { name: "Bill of Supply", addPath: "/bill-supply" },
     { name: "Payment Details", addPath: "/payment-detail" },
     { name: "Vouchers", addPath: "/voucher" },
@@ -31,8 +31,10 @@ function GenerateForms() {
             Authorization: `Bearer ${token}`,
           }
         );
-        console.log(response.data.data);
+        // console.log(response.data.data);
         setForms(response.data.data || {}); // Ensure forms is always an object
+        // console.log(forms);
+        // console.log(response);
       } catch (err) {
         console.error("Error in fetching dashboard", err);
       }

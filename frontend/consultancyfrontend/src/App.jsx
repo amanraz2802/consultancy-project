@@ -1,4 +1,5 @@
 import "./App.css";
+import { useSelector } from "react-redux";
 import ConsultancyProjectRegistrationForm from "./components/forms/ConsultancyProjectRegistrationForm";
 import Homepage from "./pages/Homepage";
 import Loginpage from "./pages/Loginpage";
@@ -20,7 +21,20 @@ import SingleProjectView from "./components/disabledForm/SingleProjectView.jsx";
 import BillOfSupply from "./components/forms/BillOfSupply.jsx";
 import Bill from "./components/viewform/Bill.jsx";
 
+import AdminApp from "./AdminApp.jsx";
+import NotFoundPage from "./components/NotFoundPage.jsx";
+import Notification from "./pages/Notification.jsx";
+import PrivateRoute from "./components/auth/PrivateRoute.jsx";
+import AdminDashboard from "./components/admin/AdminDashboard.jsx";
+import ContactUs from "./pages/ContactUs.jsx";
+import ComplaintForm from "./pages/ComplaintForm.jsx";
+
 function App() {
+  const { token, role } = useSelector((state) => state.auth);
+  // const role = "admin";
+  // if (role == "admin") {
+  //   return <AdminApp />;
+  // }
   return (
     <>
       {/* <Homepage /> */}
@@ -37,12 +51,29 @@ function App() {
       {/* <ProjectTable /> */}
       {/* <ConsentForm /> */}
       <Routes>
+        {role === "PI" && (
+          <Route
+            path="/"
+            element={
+              <OpenRoute>
+                <Homepage />
+              </OpenRoute>
+            }
+          />
+        )}
         <Route
-          path="/"
+          path="contact-us"
           element={
-            <OpenRoute>
-              <Homepage />
-            </OpenRoute>
+            <ReusableComponent title="Contact Us" element={<ContactUs />} />
+          }
+        />
+        <Route
+          path="complaint-form"
+          element={
+            <ReusableComponent
+              title="Complaint form"
+              element={<ComplaintForm />}
+            />
           }
         />
         <Route path="/login" element={<Loginpage />} />
@@ -103,7 +134,6 @@ function App() {
             </OpenRoute>
           }
         />
-
         <Route
           path="/view/work-order/:projectId"
           element={
@@ -138,7 +168,7 @@ function App() {
             </OpenRoute>
           }
         />
-        <Route
+        {/* <Route
           path=":formname"
           element={
             <OpenRoute>
@@ -146,7 +176,98 @@ function App() {
               <ReusableComponent title="" element={<Bill />} />
             </OpenRoute>
           }
+        /> */}
+        <Route
+          path="notification"
+          element={
+            <OpenRoute>
+              <ReusableComponent
+                title="Notification"
+                element={<Notification />}
+              />
+            </OpenRoute>
+          }
         />
+        <Route path="*" element={<NotFoundPage />} />
+        {/* ===================ADMIN===================== */}
+        {role === "ADMIN" && (
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <AdminDashboard />
+              </PrivateRoute>
+            }
+          />
+        )}
+
+        {/* <Route path="/admin" element={<AdminDashboard />} /> */}
+        {/* <Route
+          path="/consentForms"
+          element={
+            <ReusableComponent
+              title="Consent Forms"
+              element={<FormSearch formType="Consent Forms" />}
+            />
+          }
+        />
+        <Route
+          path="/workOrders"
+          element={
+            <ReusableComponent
+              title="Work Orders"
+              element={<FormSearch formType="Work Orders" />}
+            />
+          }
+        />
+        <Route
+          path="/billOfSupply"
+          element={
+            <ReusableComponent
+              title="Bill of Supply"
+              element={<FormSearch formType="Bill of Supply" />}
+            />
+          }
+        />
+        <Route
+          path="/paymentDetails"
+          element={
+            <ReusableComponent
+              title="Payment Details"
+              element={<FormSearch formType="Payment Details" />}
+            />
+          }
+        />
+        <Route
+          path="/vouchers"
+          element={
+            <ReusableComponent
+              title="Vouchers"
+              element={<FormSearch formType="Vouchers" />}
+            />
+          }
+        />
+        <Route
+          path="/closureForms"
+          element={
+            <ReusableComponent
+              title="Closure Forms"
+              element={<FormSearch formType="Closure Forms" />}
+            />
+          }
+        />
+        <Route
+          path="/contacts"
+          element={
+            <ReusableComponent title="Contacts" element={<ContactSection />} />
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <ReusableComponent title="Projects" element={<ProjectSection />} />
+          }
+        /> */}
       </Routes>
     </>
   );

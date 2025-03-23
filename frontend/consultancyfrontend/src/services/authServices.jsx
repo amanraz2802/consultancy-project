@@ -1,8 +1,9 @@
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export const authenticateWithGoogle = async (token) => {
   try {
-    console.log(token);
+    // console.log(token);
     const baseURL = import.meta.env.VITE_API_BASE_URL;
 
     const response = await axios.post(
@@ -17,6 +18,7 @@ export const authenticateWithGoogle = async (token) => {
 
     return response;
   } catch (error) {
+    toast.error(error.response.data.error);
     throw new Error("Error authenticating with Google: " + error.message);
   }
 };

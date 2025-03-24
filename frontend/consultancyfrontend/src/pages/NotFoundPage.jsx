@@ -9,7 +9,7 @@ function NotFoundPage() {
       <div className="bg-white p-8 rounded-lg shadow-md text-center ">
         <div className="w-32 h-32 mx-auto mb-4 ">
           <img
-            src="../../images/404.png"
+            src="https://res.cloudinary.com/dpyurrpfa/image/upload/v1742797050/o92mbnrdmrf5encoemx9.png"
             alt="404"
             className="w-full h-full object-contain rounded-full scale-150 "
           />

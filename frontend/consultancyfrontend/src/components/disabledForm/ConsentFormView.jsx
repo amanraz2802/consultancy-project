@@ -84,9 +84,9 @@ function ConsentFormView() {
       const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
       // Add watermark
-      const logoImageBytes = await fetch("../../../images/svnitLogo.png").then(
-        (res) => res.arrayBuffer()
-      );
+      const logoImageBytes = await fetch(
+        "https://res.cloudinary.com/dpyurrpfa/image/upload/v1742117068/ry46xbwnlh1qttam6inp.png"
+      ).then((res) => res.arrayBuffer());
       const logoImage = await pdfDoc.embedPng(logoImageBytes);
       const logoDims = logoImage.scale(0.5);
       const watermarkOpacity = 0.1;
@@ -225,7 +225,7 @@ function ConsentFormView() {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <img
-              src="../../../images/svnitLogo.png"
+              src="https://res.cloudinary.com/dpyurrpfa/image/upload/v1742117068/ry46xbwnlh1qttam6inp.png"
               alt="SVNIT Logo"
               className="h-20 w-28 scale-150"
             />

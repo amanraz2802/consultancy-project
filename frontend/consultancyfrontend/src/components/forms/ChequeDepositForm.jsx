@@ -20,9 +20,9 @@ const ChequeDepositForm = () => {
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
     // Add watermark
-    const logoImageBytes = await fetch("../../../images/svnitLogo.png").then(
-      (res) => res.arrayBuffer()
-    );
+    const logoImageBytes = await fetch(
+      "https://res.cloudinary.com/dpyurrpfa/image/upload/v1742117068/ry46xbwnlh1qttam6inp.png"
+    ).then((res) => res.arrayBuffer());
     const logoImage = await pdfDoc.embedPng(logoImageBytes);
     const logoDims = logoImage.scale(0.5);
     const watermarkOpacity = 0.1;
@@ -385,7 +385,7 @@ const ChequeDepositForm = () => {
       <div className="flex">
         <div>
           <img
-            src="../../../images/svnitLogo.png"
+            src="https://res.cloudinary.com/dpyurrpfa/image/upload/v1742117068/ry46xbwnlh1qttam6inp.png"
             alt="svnit logo"
             className="h-16 w-16 scale-150 mt-5"
           />

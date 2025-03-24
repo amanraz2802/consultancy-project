@@ -5,6 +5,7 @@ import { apiConnector } from "../services/apiConnectors";
 import { useSelector } from "react-redux";
 
 const Notification = () => {
+  console.log("inside notification compo");
   // Dummy notification data with added type field
   const { token } = useSelector((state) => state.auth);
   //   const currentPage = 1;

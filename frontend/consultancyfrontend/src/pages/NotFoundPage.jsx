@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useSelector } from "react-redux";
 function NotFoundPage() {
   const navigate = useNavigate();
+  const { role, token } = useSelector((state) => state.auth);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 ">
       <div className="bg-white p-8 rounded-lg shadow-md text-center ">
@@ -23,12 +24,30 @@ function NotFoundPage() {
           <br />
           or return to the homepage.
         </p>
-        <button
-          className="bg-[#0e7490] text-white px-6 py-2 rounded hover:bg-[#0c6277] transition duration-300"
-          onClick={() => navigate("/")}
-        >
-          GO HOME
-        </button>
+        {role === "ADMIN" && (
+          <button
+            className="bg-[#0e7490] text-white px-6 py-2 rounded hover:bg-[#0c6277] transition duration-300"
+            onClick={() => navigate("/admin")}
+          >
+            GO HOME
+          </button>
+        )}
+        {role === "PI" && (
+          <button
+            className="bg-[#0e7490] text-white px-6 py-2 rounded hover:bg-[#0c6277] transition duration-300"
+            onClick={() => navigate("/home")}
+          >
+            GO HOME
+          </button>
+        )}
+        {!token && (
+          <button
+            className="bg-[#0e7490] text-white px-6 py-2 rounded hover:bg-[#0c6277] transition duration-300"
+            onClick={() => navigate("/login")}
+          >
+            GO HOME
+          </button>
+        )}
       </div>
     </div>
   );

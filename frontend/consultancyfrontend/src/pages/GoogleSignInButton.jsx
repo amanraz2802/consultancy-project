@@ -3,10 +3,12 @@ import { GoogleLogin } from "@react-oauth/google";
 import { authenticateWithGoogle } from "../services/authServices";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
+import { Navigate } from "react-router-dom";
 import {
   setEmail,
   setToken,
   setName,
+  setRole,
 } from "../components/slices/authSlice.jsx"; // Import actions
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -34,13 +36,15 @@ function GoogleSignInButton() {
       dispatch(setToken(token));
       dispatch(setEmail(response.data.data.email));
       dispatch(setName(response.data.data.name));
-      dispatch(setName(response.data.data.role));
-      if (response.data.data.email) {
-        navigate("/");
+      dispatch(setRole(response.data.data.role));
+      if (response) {
+        if (response.data.data.role === "ADMIN") navigate("/admin");
+        else if (response.data.data.role === "PI") navigate("/home");
         toast.success(response.data.message);
       }
       console.log();
     } catch (error) {
+      toast.error(response.data.message);
       console.error("Login error:", error);
     }
   };

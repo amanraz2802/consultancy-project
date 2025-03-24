@@ -81,12 +81,12 @@ function ReusableComponent(props) {
                 </>
               )}
             </div>
-            <div className="rounded-xl bg-[#1f2048] p-2">
+            {/* <div className="rounded-xl bg-[#1f2048] p-2">
               <HiOutlineDownload className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
-            </div>
+            </div> */}
             <div
               className="rounded-xl bg-[#1f2048] p-2 "
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/home")}
             >
               <IoHome className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
             </div>
@@ -105,7 +105,7 @@ function ReusableComponent(props) {
           </div>
 
           <div className="group relative mb-4">
-            <FaCircleUser className="w-8 h-8 lg:w-10 lg:h-10 text-white" />
+            {/* <FaCircleUser className="w-8 h-8 lg:w-10 lg:h-10 text-white" />
             <div className="absolute left-full bottom-0 opacity-0 bg-[#1f2048] text-white rounded-md z-50 transition-opacity duration-300 group-hover:opacity-100 ml-2">
               <ul className="flex flex-col whitespace-nowrap">
                 <li className="p-2 gap-2 text-sm lg:text-base rounded flex items-center">
@@ -118,13 +118,23 @@ function ReusableComponent(props) {
                   className="flex gap-2 p-2 rounded text-sm lg:text-base items-center"
                   onClick={() => {
                     dispatch(logout());
-                    navigate("/");
+                    navigate("/login");
                   }}
                 >
                   <LuLogOut className="w-5 h-5" />
                   Logout
                 </li>
               </ul>
+            </div> */}
+            <div
+              className="flex gap-2 p-2  text-sm lg:text-base items-center rounded-xl bg-[#1f2048] "
+              onClick={() => {
+                dispatch(logout());
+                navigate("/login");
+              }}
+            >
+              <LuLogOut className="w-7 h-7 lg:w-8 lg:h-8 text-white p-1" />
+              {/* Logout */}
             </div>
           </div>
         </div>

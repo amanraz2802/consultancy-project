@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // import { Provider } from "react-redux";
 // import store from "./store"; // You would need to create this
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
-import ReusableComponent from "./pages/ReusableComponent.jsx";
 import Dashboard from "./components/admin/Dashboard";
 import UserManagement from "./components/admin/UserManagement";
 import FormSearch from "./components/admin/FormSearch";
@@ -13,90 +12,97 @@ import ProjectSection from "./components/admin/ProjectSection";
 function AdminApp() {
   return (
     // <Provider store={store}>
-
     <Routes>
-      <Route path="/admin" element={<AdminDashboard />} />
       <Route
-        path="/consentForms"
-        element={
-          <ReusableComponent
-            title="Consent Forms"
-            element={<FormSearch formType="Consent Forms" />}
-          />
-        }
-      />
-      <Route
-        path="/workOrders"
-        element={
-          <ReusableComponent
-            title="Work Orders"
-            element={<FormSearch formType="Work Orders" />}
-          />
-        }
-      />
-      <Route
-        path="/billOfSupply"
-        element={
-          <ReusableComponent
-            title="Bill of Supply"
-            element={<FormSearch formType="Bill of Supply" />}
-          />
-        }
-      />
-      <Route
-        path="/paymentDetails"
-        element={
-          <ReusableComponent
-            title="Payment Details"
-            element={<FormSearch formType="Payment Details" />}
-          />
-        }
-      />
-      <Route
-        path="/vouchers"
-        element={
-          <ReusableComponent
-            title="Vouchers"
-            element={<FormSearch formType="Vouchers" />}
-          />
-        }
-      />
-      <Route
-        path="/closureForms"
-        element={
-          <ReusableComponent
-            title="Closure Forms"
-            element={<FormSearch formType="Closure Forms" />}
-          />
-        }
-      />
-      <Route
-        path="/contacts"
-        element={
-          <ReusableComponent title="Contacts" element={<ContactSection />} />
-        }
-      />
-      <Route
-        path="/projects"
-        element={
-          <ReusableComponent title="Projects" element={<ProjectSection />} />
-        }
-      />
-      {/* <Route
         path="/"
         element={
-          <ReusableComponent
-            title="Dashboard"
-            element={
-              <AdminDashboard>
-                <Dashboard />
-              </AdminDashboard>
-            }
-          />
+          <AdminDashboard title="Dashboard">
+            <Dashboard />
+          </AdminDashboard>
         }
-      /> */}
-    </Routes>
+      />
 
+      <Route
+        path="/admin/userManagement"
+        element={
+          <AdminDashboard title="User Management">
+            <UserManagement />
+          </AdminDashboard>
+        }
+      />
+
+      <Route
+        path="/admin/consentForms"
+        element={
+          <AdminDashboard title="Consent Forms">
+            <FormSearch formType="consult" />
+          </AdminDashboard>
+        }
+      />
+
+      <Route
+        path="/admin/workOrders"
+        element={
+          <AdminDashboard title="Work Orders">
+            <FormSearch formType="work" />
+          </AdminDashboard>
+        }
+      />
+
+      <Route
+        path="/admin/billOfSupply"
+        element={
+          <AdminDashboard title="Bill of Supply">
+            <FormSearch formType="bill" />
+          </AdminDashboard>
+        }
+      />
+
+      <Route
+        path="/admin/paymentDetails"
+        element={
+          <AdminDashboard title="Payment Details">
+            <FormSearch formType="payment" />
+          </AdminDashboard>
+        }
+      />
+
+      <Route
+        path="/admin/vouchers"
+        element={
+          <AdminDashboard title="Vouchers">
+            <FormSearch formType="voucher" />
+          </AdminDashboard>
+        }
+      />
+
+      <Route
+        path="/admin/closureForms"
+        element={
+          <AdminDashboard title="Closure Forms">
+            <FormSearch formType="closure" />
+          </AdminDashboard>
+        }
+      />
+
+      <Route
+        path="/admin/contacts"
+        element={
+          <AdminDashboard title="Contacts">
+            <ContactSection />
+          </AdminDashboard>
+        }
+      />
+
+      <Route
+        path="/admin/projects"
+        element={
+          <AdminDashboard title="Projects">
+            <ProjectSection />
+          </AdminDashboard>
+        }
+      />
+    </Routes>
     // </Provider>
   );
 }

@@ -7,56 +7,20 @@ import { FaEdit, FaUsersCog, FaFileAlt } from "react-icons/fa";
 import { LuLogOut } from "react-icons/lu";
 import { IoHome } from "react-icons/io5";
 import { MdContacts, MdExpandMore, MdExpandLess } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import Dashboard from "./Dashboard";
-import UserManagement from "./UserManagement";
-// import ProjectForms from "./ProjectForms";
-import ContactSection from "./ContactSection";
-import ProjectSection from "./ProjectSection";
-import FormSearch from "./FormSearch.jsx";
 import { logout } from "../slices/authSlice.jsx";
-// import { useDispatch } from "react-redux";
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ children, title }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [activeSection, setActiveSection] = useState("dashboard");
   const [isFormDropdownOpen, setIsFormDropdownOpen] = useState(false);
   const [isExpandable, setIsExpandable] = useState(false);
 
-  // Mock logout function since we don't have the actual implementation
-  const handleLogout = () => {
-    // dispatch(logout());
-    console.log("Logging out");
-  };
-
-  const renderActiveSection = () => {
-    switch (activeSection) {
-      case "dashboard":
-        return <Dashboard />;
-      case "userManagement":
-        return <UserManagement />;
-      case "consentForms":
-        return <FormSearch formType="consult" />;
-      case "workOrders":
-        return <FormSearch formType="work" />;
-      case "billOfSupply":
-        return <FormSearch formType="bill" />;
-      case "paymentDetails":
-        return <FormSearch formType="payment" />;
-      case "vouchers":
-        return <FormSearch formType="voucher" />;
-      case "closureForms":
-        return <FormSearch formType="closure" />;
-      case "contacts":
-        return <ContactSection />;
-      case "projects":
-        return <ProjectSection />;
-      default:
-        return <Dashboard />;
-    }
+  // Function to determine if a link is active based on the current path
+  const isActive = (path) => {
+    return window.location.pathname === path;
   };
 
   return (
@@ -84,29 +48,29 @@ const AdminDashboard = () => {
 
           {/* Navigation Links */}
           <div className="flex flex-col mx-auto flex-grow mt-8 w-[95%]">
-            <button
-              onClick={() => setActiveSection("dashboard")}
+            <Link
+              to="/admin"
               className={`flex items-center rounded-2xl py-3 px-5 ${
-                activeSection === "dashboard" ? "bg-[#34357c]" : ""
+                isActive("/admin") ? "bg-[#34357c]" : ""
               }`}
             >
               <MdDashboard className="w-6 h-6" />
               {!isExpandable && (
                 <span className="hidden lg:block ml-2">Dashboard</span>
               )}
-            </button>
+            </Link>
 
-            <button
-              onClick={() => setActiveSection("userManagement")}
+            <Link
+              to="/admin/userManagement"
               className={`flex items-center rounded-2xl py-3 px-4 ${
-                activeSection === "userManagement" ? "bg-[#34357c]" : ""
+                isActive("/admin/userManagement") ? "bg-[#34357c]" : ""
               }`}
             >
               <FaUsersCog className="w-6 h-6" />
               {!isExpandable && (
                 <span className="hidden lg:block ml-2">User Management</span>
               )}
-            </button>
+            </Link>
 
             {/* Project Forms Dropdown */}
             <div className="relative">
@@ -114,13 +78,13 @@ const AdminDashboard = () => {
                 onClick={() => setIsFormDropdownOpen(!isFormDropdownOpen)}
                 className={`flex items-center rounded-2xl justify-between w-full py-3 px-4 ${
                   [
-                    "consentForms",
-                    "workOrders",
-                    "billOfSupply",
-                    "paymentDetails",
-                    "vouchers",
-                    "closureForms",
-                  ].includes(activeSection)
+                    "/admin/consentForms",
+                    "/admin/workOrders",
+                    "/admin/billOfSupply",
+                    "/admin/paymentDetails",
+                    "/admin/vouchers",
+                    "/admin/closureForms",
+                  ].includes(window.location.pathname)
                     ? "bg-[#34357c]"
                     : ""
                 }`}
@@ -140,10 +104,10 @@ const AdminDashboard = () => {
 
               {isFormDropdownOpen && (
                 <div className="lg:pl-8 rounded-2xl bg-[#0e0e25]">
-                  <button
-                    onClick={() => setActiveSection("consentForms")}
+                  <Link
+                    to="/admin/consentForms"
                     className={`flex items-center w-full py-2 px-4 ${
-                      activeSection === "consentForms" ? "text-blue-300" : ""
+                      isActive("/admin/consentForms") ? "text-blue-300" : ""
                     }`}
                   >
                     {!isExpandable ? (
@@ -153,11 +117,11 @@ const AdminDashboard = () => {
                     ) : (
                       <div className="w-2 h-2 rounded-full bg-white mx-auto"></div>
                     )}
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("workOrders")}
+                  </Link>
+                  <Link
+                    to="/admin/workOrders"
                     className={`flex items-center w-full py-2 px-4 ${
-                      activeSection === "workOrders" ? "text-blue-300" : ""
+                      isActive("/admin/workOrders") ? "text-blue-300" : ""
                     }`}
                   >
                     {!isExpandable ? (
@@ -165,11 +129,11 @@ const AdminDashboard = () => {
                     ) : (
                       <div className="w-2 h-2 rounded-full bg-white mx-auto"></div>
                     )}
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("billOfSupply")}
+                  </Link>
+                  <Link
+                    to="/admin/billOfSupply"
                     className={`flex items-center w-full py-2 px-4 ${
-                      activeSection === "billOfSupply" ? "text-blue-300" : ""
+                      isActive("/admin/billOfSupply") ? "text-blue-300" : ""
                     }`}
                   >
                     {!isExpandable ? (
@@ -179,11 +143,11 @@ const AdminDashboard = () => {
                     ) : (
                       <div className="w-2 h-2 rounded-full bg-white mx-auto"></div>
                     )}
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("paymentDetails")}
+                  </Link>
+                  <Link
+                    to="/admin/paymentDetails"
                     className={`flex items-center w-full py-2 px-4 ${
-                      activeSection === "paymentDetails" ? "text-blue-300" : ""
+                      isActive("/admin/paymentDetails") ? "text-blue-300" : ""
                     }`}
                   >
                     {!isExpandable ? (
@@ -193,11 +157,11 @@ const AdminDashboard = () => {
                     ) : (
                       <div className="w-2 h-2 rounded-full bg-white mx-auto"></div>
                     )}
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("vouchers")}
+                  </Link>
+                  <Link
+                    to="/admin/vouchers"
                     className={`flex items-center w-full py-2 px-4 ${
-                      activeSection === "vouchers" ? "text-blue-300" : ""
+                      isActive("/admin/vouchers") ? "text-blue-300" : ""
                     }`}
                   >
                     {!isExpandable ? (
@@ -205,11 +169,11 @@ const AdminDashboard = () => {
                     ) : (
                       <div className="w-2 h-2 rounded-full bg-white mx-auto"></div>
                     )}
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("closureForms")}
+                  </Link>
+                  <Link
+                    to="/admin/closureForms"
                     className={`flex items-center w-full py-2 px-4 ${
-                      activeSection === "closureForms" ? "text-blue-300" : ""
+                      isActive("/admin/closureForms") ? "text-blue-300" : ""
                     }`}
                   >
                     {!isExpandable ? (
@@ -219,34 +183,34 @@ const AdminDashboard = () => {
                     ) : (
                       <div className="w-2 h-2 rounded-full bg-white mx-auto"></div>
                     )}
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>
 
-            <button
-              onClick={() => setActiveSection("contacts")}
+            <Link
+              to="/admin/contacts"
               className={`flex items-center rounded-2xl py-3 px-4 ${
-                activeSection === "contacts" ? "bg-[#34357c]" : ""
+                isActive("/admin/contacts") ? "bg-[#34357c]" : ""
               }`}
             >
               <MdContacts className="w-6 h-6" />
               {!isExpandable && (
                 <span className="hidden lg:block ml-2">Contact Messages</span>
               )}
-            </button>
+            </Link>
 
-            <button
-              onClick={() => setActiveSection("projects")}
+            <Link
+              to="/admin/projects"
               className={`flex items-center rounded-2xl py-3 px-4 ${
-                activeSection === "projects" ? "bg-[#34357c]" : ""
+                isActive("/admin/projects") ? "bg-[#34357c]" : ""
               }`}
             >
               <FaFileAlt className="w-6 h-6" />
               {!isExpandable && (
                 <span className="hidden lg:block ml-2">Projects</span>
               )}
-            </button>
+            </Link>
           </div>
 
           {/* Bottom Icons */}
@@ -255,7 +219,7 @@ const AdminDashboard = () => {
               {!isExpandable && (
                 <div
                   className="rounded-xl bg-[#34357c] p-2 cursor-pointer hidden lg:block ml-2"
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/admin")}
                 >
                   <IoHome className="w-6 h-6  text-white" />
                 </div>
@@ -265,7 +229,10 @@ const AdminDashboard = () => {
             {!isExpandable && (
               <div
                 className="rounded-xl bg-[#34357c] p-2 cursor-pointer hidden lg:block ml-2"
-                onClick={() => dispatch(logout())}
+                onClick={() => {
+                  dispatch(logout());
+                  navigate("/login");
+                }}
               >
                 <LuLogOut className="w-6 h-6" />
               </div>
@@ -290,10 +257,19 @@ const AdminDashboard = () => {
         >
           <div className="bg-[#efefef] h-full rounded-xl shadow-lg">
             <div className="bg-white border-8 font-extrabold border-[#efefef] rounded-3xl p-6 text-2xl lg:text-4xl font-poppins">
-              {activeSection.charAt(0).toUpperCase() +
-                activeSection.slice(1).replace(/([A-Z])/g, " $1")}
+              {title ||
+                window.location.pathname
+                  .slice(1)
+                  .replace(/([A-Z])/g, " $1")
+                  .charAt(0)
+                  .toUpperCase() +
+                  window.location.pathname
+                    .slice(1)
+                    .replace(/([A-Z])/g, " $1")
+                    .slice(1) ||
+                "Dashboard"}
             </div>
-            <div className="p-6">{renderActiveSection()}</div>
+            <div className="p-6">{children}</div>
           </div>
         </div>
       </div>

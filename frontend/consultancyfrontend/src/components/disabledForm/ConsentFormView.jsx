@@ -610,7 +610,7 @@ function ConsentFormView() {
         <div className="flex justify-center">
           <button
             type="button"
-            className="bg-pink-500 mt-2 text-white px-4 py-2 rounded hover:bg-blue-600 mx-auto"
+            className="bg-[#484aad] mt-2 text-white px-4 py-2 rounded hover:bg-[#383a90] mx-auto"
             onClick={() => handleDownloadPDF(formdata)}
           >
             Download PDF

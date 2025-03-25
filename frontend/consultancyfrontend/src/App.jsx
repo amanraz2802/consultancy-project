@@ -32,45 +32,49 @@ import UserManagement from "./components/admin/UserManagement.jsx";
 import FormSearch from "./components/admin/FormSearch.jsx";
 import ContactSection from "./components/admin/ContactSection.jsx";
 import ProjectSection from "./components/admin/ProjectSection.jsx";
+import ComplaintDetails from "./pages/ComplaintDetails.jsx";
+import IndexRoute from "./components/auth/IndexRoute.jsx";
+import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
+import AdminRoute from "./components/auth/AdminRoute.jsx";
 function App() {
   const { token, role } = useSelector((state) => state.auth);
-  // const role = "admin";
-  // if (role == "admin") {
-  //   return <AdminApp />;
-  // }
   return (
     <>
-      {/* <Homepage /> */}
-      {/* <Loginpage /> */}
-      {/* <ProjectTable /> */}
-      {/* <ConsultancyProjectRegistrationForm />
+      <>
+        {/* <Homepage /> */}
+        {/* <Loginpage /> */}
+        {/* <ProjectTable /> */}
+        {/* <ConsultancyProjectRegistrationForm />
       <BillOfSupply />
       <ChequeDepositForm />
       <ConsultancyProjectCompletionReport />
       <FinalLetter />
       <PaymentReceiptForm />
-      <WorkOrderFormPage /> */}
-      {/* <InvoiceForm /> */}
-      {/* <ProjectTable /> */}
-      {/* <ConsentForm /> */}
+      <WorkOrderFormPage />
+      <InvoiceForm /> */}
+        {/* <ProjectTable /> */}
+        {/* <ConsentForm /> */}
+      </>
       <Routes>
+        <Route path="/" element={<IndexRoute />} />
+        <Route path="/login" element={<Loginpage />} />
         <Route
           path="/home"
           element={
-            <OpenRoute>
+            <ProtectedRoute>
               <Homepage />
-            </OpenRoute>
+            </ProtectedRoute>
           }
         />
         <Route
-          path="/admin"
+          path="notification"
           element={
-            <PrivateRoute>
-              <AdminApp />
-            </PrivateRoute>
+            <ReusableComponent
+              title="Notification"
+              element={<Notification />}
+            />
           }
         />
-        <Route path="/login" element={<Loginpage />} />
         <Route
           path="contact-us"
           element={
@@ -86,7 +90,34 @@ function App() {
             />
           }
         />
-
+        <Route
+          path="complain/:id"
+          element={
+            <ReusableComponent
+              title="Complaint Detail"
+              element={<ComplaintDetails />}
+            />
+          }
+        />
+        <Route
+          path="view/project/:projectId"
+          element={
+            <ReusableComponent
+              title="Project details"
+              element={<SingleProjectView />}
+            />
+          }
+        />
+        {/* ==========================Consent-form route===================================== */}
+        <Route
+          path="consent-form"
+          element={
+            <ReusableComponent
+              title="Projects: Consent Form"
+              element={<ConsentForm />}
+            />
+          }
+        />
         <Route
           path="/create/consent-form"
           element={
@@ -99,15 +130,7 @@ function App() {
             </OpenRoute>
           }
         />
-        <Route
-          path="view/project/:abc"
-          element={
-            <ReusableComponent
-              title="Project details"
-              element={<SingleProjectView />}
-            />
-          }
-        />
+
         <Route
           path="create/consent-form/:projectId"
           element={
@@ -116,18 +139,6 @@ function App() {
               <ReusableComponent
                 title="Consent form"
                 element={<ConsultancyProjectRegistrationForm />}
-              />
-            </OpenRoute>
-          }
-        />
-        <Route
-          path="create/work-order/:projectId"
-          element={
-            <OpenRoute>
-              {" "}
-              <ReusableComponent
-                title="Work Order"
-                element={<WorkOrderFormPage />}
               />
             </OpenRoute>
           }
@@ -144,18 +155,8 @@ function App() {
             </OpenRoute>
           }
         />
-        <Route
-          path="/view/work-order/:projectId"
-          element={
-            <OpenRoute>
-              {" "}
-              <ReusableComponent
-                title="Work Order View"
-                element={<WorkFormView />}
-              />
-            </OpenRoute>
-          }
-        />
+
+        {/* ==========================Work-order routes============================ */}
         <Route
           path="work-order"
           element={
@@ -168,14 +169,31 @@ function App() {
           }
         />
         <Route
-          path="consent-form"
+          path="create/work-order/:projectId"
           element={
-            <ReusableComponent
-              title="Projects: Consent Form"
-              element={<ConsentForm />}
-            />
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Work Order"
+                element={<WorkOrderFormPage />}
+              />
+            </OpenRoute>
           }
         />
+
+        <Route
+          path="/view/work-order/:projectId"
+          element={
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Work Order View"
+                element={<WorkFormView />}
+              />
+            </OpenRoute>
+          }
+        />
+
         {/* <Route
           path=":formname"
           element={
@@ -185,98 +203,116 @@ function App() {
             </OpenRoute>
           }
         /> */}
+
+        {/* ===================================ADMIN======================================== */}
         <Route
-          path="notification"
+          path="/admin"
           element={
-            <ReusableComponent
-              title="Notification"
-              element={<Notification />}
-            />
+            <AdminRoute>
+              <AdminApp />
+            </AdminRoute>
           }
         />
-        <Route path="*" element={<NotFoundPage />} />
-        {/* ===================ADMIN===================== */}
 
         <Route
           path="/admin/userManagement"
           element={
-            <AdminDashboard title="User Management">
-              <UserManagement />
-            </AdminDashboard>
+            <AdminRoute>
+              <AdminDashboard title="User Management">
+                <UserManagement />
+              </AdminDashboard>
+            </AdminRoute>
           }
         />
 
         <Route
           path="/admin/consentForms"
           element={
-            <AdminDashboard title="Consent Forms">
-              <FormSearch formType="consult" />
-            </AdminDashboard>
+            <AdminRoute>
+              <AdminDashboard title="Consent Forms">
+                <FormSearch formType="consult" />
+              </AdminDashboard>
+            </AdminRoute>
           }
         />
 
         <Route
           path="/admin/workOrders"
           element={
-            <AdminDashboard title="Work Orders">
-              <FormSearch formType="work" />
-            </AdminDashboard>
+            <AdminRoute>
+              <AdminDashboard title="Work Orders">
+                <FormSearch formType="work" />
+              </AdminDashboard>
+            </AdminRoute>
           }
         />
 
         <Route
           path="/admin/billOfSupply"
           element={
-            <AdminDashboard title="Bill of Supply">
-              <FormSearch formType="bill" />
-            </AdminDashboard>
+            <AdminRoute>
+              <AdminDashboard title="Bill of Supply">
+                <FormSearch formType="bill" />
+              </AdminDashboard>
+            </AdminRoute>
           }
         />
 
         <Route
           path="/admin/paymentDetails"
           element={
-            <AdminDashboard title="Payment Details">
-              <FormSearch formType="payment" />
-            </AdminDashboard>
+            <AdminRoute>
+              <AdminDashboard title="Payment Details">
+                <FormSearch formType="payment" />
+              </AdminDashboard>
+            </AdminRoute>
           }
         />
 
         <Route
           path="/admin/vouchers"
           element={
-            <AdminDashboard title="Vouchers">
-              <FormSearch formType="voucher" />
-            </AdminDashboard>
+            <AdminRoute>
+              <AdminDashboard title="Vouchers">
+                <FormSearch formType="voucher" />
+              </AdminDashboard>
+            </AdminRoute>
           }
         />
 
         <Route
           path="/admin/closureForms"
           element={
-            <AdminDashboard title="Closure Forms">
-              <FormSearch formType="closure" />
-            </AdminDashboard>
+            <AdminRoute>
+              <AdminDashboard title="Closure Forms">
+                <FormSearch formType="closure" />
+              </AdminDashboard>
+            </AdminRoute>
           }
         />
 
         <Route
           path="/admin/contacts"
           element={
-            <AdminDashboard title="Contacts">
-              <ContactSection />
-            </AdminDashboard>
+            <AdminRoute>
+              <AdminDashboard title="Contacts">
+                <ContactSection />
+              </AdminDashboard>
+            </AdminRoute>
           }
         />
 
         <Route
           path="/admin/projects"
           element={
-            <AdminDashboard title="Projects">
-              <ProjectSection />
-            </AdminDashboard>
+            <AdminRoute>
+              <AdminDashboard title="Projects">
+                <ProjectSection />
+              </AdminDashboard>
+            </AdminRoute>
           }
         />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );

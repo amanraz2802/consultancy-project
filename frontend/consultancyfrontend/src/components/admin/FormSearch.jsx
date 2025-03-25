@@ -7,9 +7,13 @@ const FormSearch = ({ formType }) => {
   const { token } = useSelector((state) => state.auth);
   const [projectId, setProjectId] = useState("");
   const [showAllForms, setShowAllForms] = useState(true);
-
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  if (loading) {
+    return <Spinner text={"Please wait a moment..."} />;
+  }
   useEffect(() => {
+    setLoading(true);
     async function fetchForms() {
       try {
         const response = await apiConnector(
@@ -27,10 +31,12 @@ const FormSearch = ({ formType }) => {
       } catch (error) {
         console.error("Error fetching forms:", error);
         setData([]); // Handle errors properly
+        setLoading(false);
       }
     }
 
     fetchForms();
+    setLoading(false);
   }, [formType, token]);
 
   const filteredForms = showAllForms

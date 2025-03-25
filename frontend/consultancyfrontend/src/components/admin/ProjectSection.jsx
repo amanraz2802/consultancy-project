@@ -12,62 +12,7 @@ const ProjectSection = () => {
   const { token } = useSelector((state) => state.auth);
   // Mock data for projects
   const [projects, setProjects] = useState([]);
-  //     {
-  //       id: "PROJ-2023-089",
-  //       title: "Solar Panel Installation",
-  //       pi: "Dr. Patel",
-  //       department: "Electrical Engineering",
-  //       status: "Active",
-  //       startDate: "2023-08-15",
-  //       endDate: "2024-02-15",
-  //       budget: "₹ 12,50,000",
-  //       currentStage: "Work Order",
-  //     },
-  //     {
-  //       id: "PROJ-2023-092",
-  //       title: "Water Treatment Plant",
-  //       pi: "Dr. Sharma",
-  //       department: "Civil Engineering",
-  //       status: "Active",
-  //       startDate: "2023-09-01",
-  //       endDate: "2024-03-01",
-  //       budget: "₹ 18,75,000",
-  //       currentStage: "Bill of Supply",
-  //     },
-  //     {
-  //       id: "PROJ-2023-078",
-  //       title: "Smart Classroom Implementation",
-  //       pi: "Dr. Mehta",
-  //       department: "Computer Science",
-  //       status: "On Hold",
-  //       startDate: "2023-07-01",
-  //       endDate: "2024-01-01",
-  //       budget: "₹ 8,25,000",
-  //       currentStage: "Consent Form",
-  //     },
-  //     {
-  //       id: "PROJ-2023-085",
-  //       title: "Laboratory Equipment",
-  //       pi: "Dr. Singh",
-  //       department: "Mechanical Engineering",
-  //       status: "Active",
-  //       startDate: "2023-08-01",
-  //       endDate: "2023-12-31",
-  //       budget: "₹ 9,85,000",
-  //       currentStage: "Payment Details",
-  //     },
-  //     {
-  //       id: "PROJ-2023-081",
-  //       title: "Campus Network Upgrade",
-  //       pi: "Dr. Kumar",
-  //       department: "Electronics & Communication",
-  //       status: "Completed",
-  //       startDate: "2023-06-15",
-  //       endDate: "2023-10-15",
-  //       budget: "₹ 15,40,000",
-  //       currentStage: "Closure Form",
-  //     },
-  //   ]);
+  const [loading, setLoading] = useState(false);
 
   const filteredProjects = showAllProjects
     ? projects
@@ -81,6 +26,7 @@ const ProjectSection = () => {
   };
 
   async function handleViewAll() {
+    setLoading(true);
     setProjectId("");
     setShowAllProjects(true);
     const response = await apiConnector(
@@ -92,6 +38,7 @@ const ProjectSection = () => {
       }
     );
     console.log(response);
+    setLoading(false);
     setProjects(response.data.data);
   }
 
@@ -101,6 +48,7 @@ const ProjectSection = () => {
   };
 
   const confirmReject = async () => {
+    setLoading(true);
     try {
       const response = await apiConnector(
         "POST",
@@ -115,9 +63,13 @@ const ProjectSection = () => {
     } catch (err) {
       console.log(err);
       setShowConfirmDialog(false);
+      setLoading(false);
     }
+    setLoading(false);
   };
-
+  if (loading) {
+    return <Spinner text={"Please wait a moment..."} />;
+  }
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-md p-6">

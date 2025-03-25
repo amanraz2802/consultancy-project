@@ -3,11 +3,14 @@ import { Info, Bell, Shield, Star, BadgeAlert } from "lucide-react";
 import Pagination from "@mui/material/Pagination";
 import { apiConnector } from "../services/apiConnectors";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Notification = () => {
   console.log("inside notification compo");
   // Dummy notification data with added type field
   const { token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   //   const currentPage = 1;
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -139,12 +142,14 @@ const Notification = () => {
                       </button>
                     )}
                   </div>
-                  <a
-                    href={notification.link_to}
+                  <div
+                    onClick={() => {
+                      navigate(notification.linkTo);
+                    }}
                     className="text-blue-600 hover:text-blue-800 text-xs mt-1 inline-block"
                   >
                     View details
-                  </a>
+                  </div>
                 </div>
               </div>
             </div>

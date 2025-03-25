@@ -9,7 +9,7 @@ const UserManagement = () => {
 
   const [users, setUsers] = useState([]);
   const { token } = useSelector((state) => state.auth);
-
+  const [loading, setLoading] = useState(false);
   async function handleFilter() {
     const filterdata = {
       dept: filterDept,
@@ -44,6 +44,7 @@ const UserManagement = () => {
   });
 
   async function handleFreeze(id) {
+    setLoading(true);
     const response = await apiConnector(
       "POST",
       `/admin/user/${encodeURIComponent(id)}/freeze`,
@@ -54,8 +55,10 @@ const UserManagement = () => {
     );
     console.log(response);
     handleFilter();
+    setLoading(false);
   }
   async function handleUnfreeze(id) {
+    setLoading(true);
     const response = await apiConnector(
       "POST",
       `/admin/user/${encodeURIComponent(id)}/unfreeze`,
@@ -66,6 +69,10 @@ const UserManagement = () => {
     );
     console.log(response);
     handleFilter();
+    setLoading(false);
+  }
+  if (loading) {
+    return <Spinner text={"Please wait a moment..."} />;
   }
   return (
     <div className="space-y-6">
@@ -115,80 +122,81 @@ const UserManagement = () => {
           </button>
         </div>
       </div>
-
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="py-3 px-4 text-left">Name</th>
-                <th className="py-3 px-4 text-left">Email</th>
-                <th className="py-3 px-4 text-left">Role</th>
-                <th className="py-3 px-4 text-left">Department</th>
-                <th className="py-3 px-4 text-left">Status</th>
-                <th className="py-3 px-4 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user) => (
-                <tr key={user.id} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-4">{user.name}</td>
-                  <td className="py-3 px-4">{user.email}</td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.role === "PI"
-                          ? "bg-blue-100 text-blue-800"
-                          : user.role === "HOD"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">{user.dept}</td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.freeze === 0
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {user.freeze === 0 ? "Active" : "Restricted"}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex space-x-2">
-                      <button
-                        className="p-1 bg-green-100 text-green-600 rounded hover:bg-green-200"
-                        onClick={() => handleUnfreeze(user.id)}
-                        disabled={user.freeze === 0}
-                      >
-                        <FaCheck />
-                      </button>
-                      <button
-                        className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
-                        onClick={() => handleFreeze(user.id)}
-                        disabled={user.freeze === 1}
-                      >
-                        <FaTimes />
-                      </button>
-                      {/* <button className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200">
-                        <FaEdit />
-                      </button>
-                      <button className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200">
-                        <FaTrash />
-                      </button> */}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {users.length === 0 ? (
+        <div className="bg-gray-50 p-8 text-center rounded-lg">
+          <p className="text-gray-500">
+            No users found Try a different user ID or apply filters.
+          </p>
         </div>
-      </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="py-3 px-4 text-left">Name</th>
+                  <th className="py-3 px-4 text-left">Email</th>
+                  <th className="py-3 px-4 text-left">Role</th>
+                  <th className="py-3 px-4 text-left">Department</th>
+                  <th className="py-3 px-4 text-left">Status</th>
+                  <th className="py-3 px-4 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.id} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-4">{user.name}</td>
+                    <td className="py-3 px-4">{user.email}</td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          user.role === "PI"
+                            ? "bg-blue-100 text-blue-800"
+                            : user.role === "HOD"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                      >
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">{user.dept}</td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          user.freeze === 0
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {user.freeze === 0 ? "Active" : "Restricted"}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex space-x-2">
+                        <button
+                          className="p-1 bg-green-100 text-green-600 rounded hover:bg-green-200"
+                          onClick={() => handleUnfreeze(user.id)}
+                          disabled={user.freeze === 0}
+                        >
+                          <FaCheck />
+                        </button>
+                        <button
+                          className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                          onClick={() => handleFreeze(user.id)}
+                          disabled={user.freeze === 1}
+                        >
+                          <FaTimes />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

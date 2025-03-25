@@ -12,6 +12,7 @@ import ProjectTable from "../../pages/ProjectTable";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { z } from "zod";
+import Spinner from "../spinner/Spinner";
 
 // Define your filter schema
 const filterSchema = z
@@ -356,7 +357,7 @@ function FindForms() {
                       }`}
                       onClick={(e) => handleDeptSelection(value, e)}
                     >
-                      {value}
+                      {value.toUpperCase()}
                     </div>
                   )
                 )}
@@ -368,6 +369,7 @@ function FindForms() {
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          {/* <Spinner text={"Filtering forms"} /> */}
         </div>
       ) : data.length > 0 ? (
         <>

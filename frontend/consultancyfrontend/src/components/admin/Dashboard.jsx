@@ -30,39 +30,12 @@ const Dashboard = () => {
 
   // Mock data for recent activities
   const [recentActivities, setRecentActivities] = useState([]);
-  //   [
-  //     {
-  //       type: "Project Approved",
-  //       project: "PROJ-2023-089",
-  //       time: "2 hours ago",
-  //       status: "approved",
-  //     },
-  //     {
-  //       type: "New Form Submission",
-  //       project: "PROJ-2023-092",
-  //       time: "4 hours ago",
-  //       status: "pending",
-  //     },
-  //     {
-  //       type: "Project Rejected",
-  //       project: "PROJ-2023-078",
-  //       time: "1 day ago",
-  //       status: "rejected",
-  //     },
-  //     {
-  //       type: "New Contact Message",
-  //       project: "PROJ-2023-085",
-  //       time: "1 day ago",
-  //       status: "pending",
-  //     },
-  //     {
-  //       type: "Form Updated",
-  //       project: "PROJ-2023-081",
-  //       time: "2 days ago",
-  //       status: "updated",
-  //     },
-  //   ];
+  const [loading, setLoading] = useState(false);
+  if (loading) {
+    return <Spinner text={"Please wait a moment..."} />;
+  }
   useEffect(() => {
+    setLoading(true);
     async function fetchDashboard() {
       try {
         const response = await apiConnector(
@@ -108,9 +81,11 @@ const Dashboard = () => {
         }
       } catch (err) {
         console.log(err, "in admin dashboard");
+        setLoading(false);
       }
     }
     fetchDashboard();
+    setLoading(false);
   }, []);
   return (
     <div className="space-y-8">

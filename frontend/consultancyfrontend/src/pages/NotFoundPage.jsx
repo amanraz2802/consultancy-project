@@ -24,7 +24,7 @@ function NotFoundPage() {
           <br />
           or return to the homepage.
         </p>
-        {role === "ADMIN" && (
+        {/* {token && role === "ADMIN" && (
           <button
             className="bg-[#0e7490] text-white px-6 py-2 rounded hover:bg-[#0c6277] transition duration-300"
             onClick={() => navigate("/admin")}
@@ -47,7 +47,13 @@ function NotFoundPage() {
           >
             GO HOME
           </button>
-        )}
+        )} */}
+        <button
+          className="bg-[#0e7490] text-white px-6 py-2 rounded hover:bg-[#0c6277] transition duration-300"
+          onClick={() => navigate("/")}
+        >
+          GO HOME
+        </button>
       </div>
     </div>
   );

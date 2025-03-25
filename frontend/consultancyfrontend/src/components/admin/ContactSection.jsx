@@ -13,13 +13,16 @@ const ContactSection = () => {
   // Mock data for contact messages
   const { token } = useSelector((state) => state.auth);
   const [messages, setMessages] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   const [emailModal, setEmailModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [reply, setReply] = useState("");
   const [filter, setFilter] = useState("all");
-
+  if (loading) {
+    return <Spinner text={"Please wait a moment..."} />;
+  }
   useEffect(() => {
+    setLoading(true);
     async function fetchMessages() {
       const response = await apiConnector(
         "GET",
@@ -33,8 +36,10 @@ const ContactSection = () => {
       //   console.log(response);
     }
     fetchMessages();
+    setLoading(false);
   }, []);
   async function handleStatusChange(complainId, newStatus) {
+    setLoading(true);
     const response = await apiConnector(
       "POST",
       `/admin/complain/${complainId}/${newStatus}`,
@@ -46,7 +51,8 @@ const ContactSection = () => {
     if (response) {
       toast.success(response.data.message);
     }
-    console.log(response);
+    setLoading(false);
+    // console.log(response);
   }
 
   const handleEmailOpen = (message) => {
@@ -56,6 +62,7 @@ const ContactSection = () => {
   };
 
   async function handleSendReply(id, message) {
+    setLoading(true);
     const formdata = { complainId: id.toString(), response: message };
     const response = await apiConnector("POST", "/admin/complain", formdata, {
       Authorization: `Bearer ${token}`,
@@ -66,6 +73,7 @@ const ContactSection = () => {
     handleStatusChange(id, "resolve");
     // console.log(response);
     setEmailModal(false);
+    setLoading(false);
   }
 
   const filteredMessages =

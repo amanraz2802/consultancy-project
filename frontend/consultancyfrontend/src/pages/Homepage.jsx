@@ -9,12 +9,12 @@ import Dashboard from "../components/home/Dashboard";
 import ConsultancyProjectRegistrationForm from "../components/forms/ConsultancyProjectRegistrationForm";
 import ReusableComponent from "./ReusableComponent";
 function Homepage() {
-  const { name, email } = useSelector((state) => state.auth);
+  const { name, email, role } = useSelector((state) => state.auth);
   return (
     <div>
       {" "}
       <ReusableComponent
-        title={`Welcome ${name}`}
+        title={`Welcome ${name} (${role})`}
         element={<Dashboard />}
       />{" "}
     </div>

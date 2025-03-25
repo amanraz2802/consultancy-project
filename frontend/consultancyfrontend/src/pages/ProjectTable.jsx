@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const ProjectTable = ({ data }) => {
   const navigate = useNavigate();
   const [expandedRows, setExpandedRows] = useState(new Set());
+  // const { role, email, department } = useSelector((state) => state.auth);
 
   const toggleRow = (projectID) => {
     const newExpandedRows = new Set(expandedRows);
@@ -18,14 +20,14 @@ const ProjectTable = ({ data }) => {
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
-      case "ongoing":
-        return "text-orange-500";
       case "completed":
+      case "approved":
         return "text-green-500";
       case "rejected":
         return "text-red-500";
       case "pending":
       case "in progress":
+      case "ongoing":
         return "text-yellow-500";
       case "submitted":
         return "text-blue-500";

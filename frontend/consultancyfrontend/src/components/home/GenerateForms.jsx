@@ -4,11 +4,13 @@ import { useSelector } from "react-redux";
 import { IoMdDocument } from "react-icons/io";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
 import { apiConnector } from "../../services/apiConnectors";
+import Spinner from "../spinner/Spinner";
 // import "@fontsource/poppins";
 
 function GenerateForms() {
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [forms, setForms] = useState({});
   const data = [
@@ -23,6 +25,7 @@ function GenerateForms() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
+        setLoading(true);
         const response = await apiConnector(
           "GET",
           "/user/dashboard",
@@ -35,7 +38,9 @@ function GenerateForms() {
         setForms(response.data.data || {}); // Ensure forms is always an object
         // console.log(forms);
         // console.log(response);
+        setLoading(false);
       } catch (err) {
+        setLoading(false);
         console.error("Error in fetching dashboard", err);
       }
     };
@@ -50,7 +55,9 @@ function GenerateForms() {
     "#f04f3a",
     "#cfd7e0",
   ];
-
+  if (loading) {
+    return <Spinner text={"Loading dashboard"} />;
+  }
   return (
     <div className="px-4 lg:px-10">
       <h2 className="font-semibold text-lg mt-10 mb-7">Generate Forms:</h2>

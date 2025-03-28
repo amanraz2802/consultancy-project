@@ -352,15 +352,17 @@ const PaymentDetailView = () => {
                           <HiOutlineEye className="text-lg" />
                           <span>View Details</span>
                         </button>
-                        <button
-                          onClick={() =>
-                            navigate(`/view/voucher/${project.id}`)
-                          }
-                          className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-blue-700"
-                        >
-                          <HiOutlineEye className="text-lg" />
-                          <span>View voucher</span>
-                        </button>
+                        {project.payment == 5 && (
+                          <button
+                            onClick={() =>
+                              navigate(`/view/voucher/${project.id}`)
+                            }
+                            className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-blue-700"
+                          >
+                            <HiOutlineEye className="text-lg" />
+                            <span>View voucher</span>
+                          </button>
+                        )}
                         <button
                           onClick={() =>
                             navigate(`/view/project/${project.id}`)

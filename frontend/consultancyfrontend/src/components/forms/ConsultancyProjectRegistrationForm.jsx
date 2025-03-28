@@ -72,7 +72,7 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
   useEffect(() => {
     if (data) {
       setFormData({
-        projectId: data.projectId.toString() || "",
+        projectId: data.projectId?.toString() || "",
         date: date.toISOString().split("T")[0],
         principalFacultyName: email,
         associatedFacultyNames: data.associatedFacultyNames || [],

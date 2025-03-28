@@ -188,7 +188,7 @@ const PaymentDetailView = () => {
                   <span>View Payment Note</span>
                 </button>
                 <button
-                  onClick={() => navigate("/view/project/18")}
+                  onClick={() => navigate(`/view/project/${project.id}`)}
                   className="flex items-center gap-1 px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-indigo-700"
                 >
                   <FiFolder className="text-lg" />

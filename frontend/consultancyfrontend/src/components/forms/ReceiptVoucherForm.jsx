@@ -5,9 +5,11 @@ import { useSelector } from "react-redux";
 import { apiConnector } from "../../services/apiConnectors";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { ulid } from "ulid";
 
 const ReceiptVoucherForm = () => {
+  function generateCustomId() {
+    return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+  }
   const navigate = useNavigate();
   const { projectId } = useParams();
   const { token } = useSelector((state) => state.auth);
@@ -15,7 +17,7 @@ const ReceiptVoucherForm = () => {
 
   const [formData, setFormData] = useState({
     projectId: parseInt(projectId),
-    voucherNo: ulid(),
+    voucherNo: generateCustomId(),
     date: "29-Jan-2025",
     account: "Fine Charges From Students",
     amount: "100.00",

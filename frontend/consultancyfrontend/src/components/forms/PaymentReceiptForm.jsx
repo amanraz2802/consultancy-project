@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { ulid } from "ulid";
+// import { ulid } from "ulid";
 import { apiConnector } from "../../services/apiConnectors";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
@@ -12,6 +12,10 @@ const PaymentReceiptForm = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
   const [loading, setLoading] = useState(false);
+
+  function generateCustomId() {
+    return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -65,9 +69,9 @@ const PaymentReceiptForm = () => {
     }
     setLoading(false);
   };
-  console.log(ulid());
+
   const [formData, setFormData] = useState({
-    receiptNo: ulid(),
+    receiptNo: generateCustomId(),
     date: "",
     projectNo: projectId,
     workName: "",

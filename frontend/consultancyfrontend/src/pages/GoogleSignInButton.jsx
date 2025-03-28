@@ -20,7 +20,7 @@ function GoogleSignInButton() {
   const handleLoginSuccess = async (response) => {
     const token = response.credential; // Google login token
     try {
-      // console.log(token);
+      console.log(token);
       const response = await authenticateWithGoogle(token);
       console.log(response, "here");
       // console.log(response.data.token);
@@ -39,7 +39,12 @@ function GoogleSignInButton() {
       dispatch(setRole(response.data.data.role));
       if (response) {
         if (response.data.data.role === "ADMIN") navigate("/admin");
-        else if (response.data.data.role === "PI") navigate("/home");
+        else if (
+          response.data.data.role === "PI" ||
+          response.data.data.role === "HOD" ||
+          response.data.data.role === "DEAN"
+        )
+          navigate("/home");
         toast.success(response.data.message);
       }
       console.log();

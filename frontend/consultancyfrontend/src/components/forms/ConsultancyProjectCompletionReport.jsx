@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import Spinner from "../spinner/Spinner";
 const ConsultancyProjectCompletionReport = () => {
   const [formData, setFormData] = useState({
     consultancyProjectNo: "",

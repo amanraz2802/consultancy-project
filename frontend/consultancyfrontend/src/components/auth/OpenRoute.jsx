@@ -7,7 +7,7 @@ import Homepage from "../../pages/Homepage";
 function OpenRoute({ children }) {
   const { token, role } = useSelector((state) => state.auth);
 
-  if (token !== null && role == "PI") {
+  if (token !== null && ["PI", "HOD", "DEAN"].includes(role)) {
     return children;
   } else {
     return <Navigate to="/login" />;

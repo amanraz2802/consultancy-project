@@ -11,6 +11,10 @@ function IndexRoute() {
       navigate("/admin");
     } else if (token && role === "PI") {
       navigate("/home");
+    } else if (token && role === "HOD") {
+      navigate("/home");
+    } else if (token && role === "DEAN") {
+      navigate("/home");
     } else {
       navigate("/login");
     }

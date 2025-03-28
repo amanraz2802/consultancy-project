@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { CiCirclePlus } from "react-icons/ci";
+import { apiConnector } from "../../services/apiConnectors";
+import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import {
   HiCheck,
   HiX,
   HiInformationCircle,
+  HiFolder,
   HiOutlineEye,
   HiOutlineClipboardList,
 } from "react-icons/hi";
-import { FiFolder, FiEdit } from "react-icons/fi";
-import { apiConnector } from "../../services/apiConnectors";
-import { useSelector } from "react-redux";
+import { CiCirclePlus } from "react-icons/ci";
+import { FiFolder } from "react-icons/fi";
 
-const ConsentForm = () => {
+const PaymentDetailView = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedForm, setSelectedForm] = useState(null);
@@ -31,7 +31,7 @@ const ConsentForm = () => {
       try {
         const response = await apiConnector(
           "GET",
-          "/form/getProjects/consult",
+          "/form/getProjects/payment",
           {},
           {
             Authorization: `Bearer ${token}`,
@@ -40,8 +40,9 @@ const ConsentForm = () => {
         setData(response.data.data || []);
         console.log(response.data.data);
       } catch (err) {
-        console.error("Error in fetching consent forms:", err);
+        console.error("Error in fetching payment details:", err);
         setData([]);
+        toast.error("Failed to fetch payment details");
       } finally {
         setIsLoading(false);
       }
@@ -56,8 +57,8 @@ const ConsentForm = () => {
     try {
       const endpoint =
         action === "accept"
-          ? `/form/consult/accept/${selectedForm.id}`
-          : `/form/consult/reject/${selectedForm.id}`;
+          ? `/form/payment/accept/${selectedForm.id}`
+          : `/form/payment/reject/${selectedForm.id}`;
 
       const response = await apiConnector(
         "POST",
@@ -72,7 +73,7 @@ const ConsentForm = () => {
       setData((prev) =>
         prev.map((item) =>
           item.id === selectedForm.id
-            ? { ...item, consentStatus: action === "accept" ? 3 : 2 }
+            ? { ...item, payment: action === "accept" ? 4 : 2 }
             : item
         )
       );
@@ -80,12 +81,12 @@ const ConsentForm = () => {
       setSelectedForm(null);
       console.log(response);
       if (response) {
-        toast.success("Reviewed Successfully");
+        toast.success("Payment Note Reviewed Successfully");
       }
       setRemarks("");
     } catch (error) {
       console.error("Error in approval action:", error);
-      toast.error("Reviewed failed");
+      toast.error("Review failed");
     }
   };
 
@@ -94,7 +95,9 @@ const ConsentForm = () => {
       <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-800">
-            {modalType === "accept" ? "Accept Form" : "Reject Form"}
+            {modalType === "accept"
+              ? "Accept Payment Note"
+              : "Reject Payment Note"}
           </h2>
           <button
             onClick={() => setApprovalModal(false)}
@@ -115,8 +118,8 @@ const ConsentForm = () => {
           <HiInformationCircle className="text-yellow-600 mr-3" size={24} />
           <p className="text-yellow-800 text-sm">
             {modalType === "accept"
-              ? "You are about to approve this consent form."
-              : "You are about to reject this consent form."}
+              ? "You are about to approve this payment note."
+              : "You are about to reject this payment note."}
           </p>
         </div>
 
@@ -156,42 +159,42 @@ const ConsentForm = () => {
             <div className="font-medium">{project.title}</div>
           </td>
           <td className="px-6 py-4">
-            {project.consentStatus ? (
-              <span className="bg-green-100 text-green-800 text-xs font-medium px-3 py-1 rounded-full">
-                Completed
+            {project.payment === -1 || project.payment === 0 ? (
+              <span className="bg-amber-100 text-amber-800 text-xs font-medium px-3 py-1 rounded-full">
+                Pending
               </span>
             ) : (
-              <span className="bg-amber-100 text-amber-800 text-xs font-medium px-3 py-1 rounded-full">
-                Draft
+              <span className="bg-green-100 text-green-800 text-xs font-medium px-3 py-1 rounded-full">
+                Completed
               </span>
             )}
           </td>
           <td className="px-6 py-4">
-            {project.consentStatus ? (
+            {project.payment === -1 || project.payment === 0 ? (
+              <button
+                onClick={() => navigate(`/create/payment-detail/${project.id}`)}
+                className="flex w-48 items-center gap-1 px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-orange-700"
+              >
+                <CiCirclePlus className="text-lg" />
+                <span>Create Payment Note</span>
+              </button>
+            ) : (
               <div className="flex gap-3">
-                <Link
-                  to={`/view/consent-form/${project.id}`}
+                <button
+                  onClick={() => navigate(`/view/payment-detail/${project.id}`)}
                   className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-blue-700"
                 >
                   <HiOutlineEye className="text-lg" />
-                  <span>View Form</span>
-                </Link>
-                <Link
-                  to={`/view/project/18`}
+                  <span>View Payment Note</span>
+                </button>
+                <button
+                  onClick={() => navigate("/view/project/18")}
                   className="flex items-center gap-1 px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-indigo-700"
                 >
                   <FiFolder className="text-lg" />
                   <span>View Project</span>
-                </Link>
+                </button>
               </div>
-            ) : (
-              <Link
-                to={`/create/consent-form/${project.id}`}
-                className="flex w-36 items-center gap-1 px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-orange-700"
-              >
-                <FiEdit className="text-lg" />
-                <span>Complete Draft</span>
-              </Link>
             )}
           </td>
         </tr>
@@ -200,16 +203,11 @@ const ConsentForm = () => {
 
     if (role === "HOD") {
       // Filter projects by status
-      const pendingForms = data.filter(
-        (project) => project.consentStatus === 1
+      const pendingForms = data.filter((project) => project.payment === 1);
+      const acceptedForms = data.filter((project) =>
+        [3, 4, 5].includes(project.payment)
       );
-      const acceptedForms = data.filter(
-        (project) => [3, 4, 5].includes(project.consentStatus)
-        // project.consentStatus === 2
-      );
-      const rejectedForms = data.filter(
-        (project) => project.consentStatus === 2
-      );
+      const rejectedForms = data.filter((project) => project.payment === 2);
 
       return (
         <>
@@ -228,30 +226,32 @@ const ConsentForm = () => {
                 <td className="px-6 py-4">
                   <span
                     className={`text-xs font-medium px-3 py-1 rounded-full ${
-                      project.consentStatus === 1
+                      project.payment === 1
                         ? "bg-amber-100 text-amber-800"
-                        : [3, 5].includes(project.consentStatus)
+                        : [3, 4, 5].includes(project.payment)
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {project.consentStatus === 1
+                    {project.payment === 1
                       ? "Pending Review"
-                      : [3, 4, 5].includes(project.consentStatus)
+                      : [3, 4, 5].includes(project.payment)
                       ? "Accepted"
                       : "Rejected"}
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex gap-3">
-                    <Link
-                      to={`/view/consent-form/${project.id}`}
+                    <button
+                      onClick={() =>
+                        navigate(`/view/payment-detail/${project.id}`)
+                      }
                       className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-blue-700"
                     >
                       <HiOutlineEye className="text-lg" />
                       <span>View Details</span>
-                    </Link>
-                    {project.consentStatus === 1 && (
+                    </button>
+                    {project.payment === 1 && (
                       <>
                         <button
                           onClick={() => {
@@ -288,74 +288,121 @@ const ConsentForm = () => {
 
     if (role === "DEAN") {
       // Separate sections for different statuses
-      const pendingForms = data.filter(
-        (project) => project.consentStatus === 3
-      );
-      const acceptedForms = data.filter(
-        (project) => project.consentStatus === 4
-      );
-      const rejectedForms = data.filter(
-        (project) => project.consentStatus === 2
-      );
-
-      const renderFormSection = (forms, title, statusColor) =>
-        forms.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-              {title}
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {forms.map((project) => (
-                <div
-                  key={project.id}
-                  className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transform transition-all hover:scale-105 hover:shadow-lg"
-                >
-                  <div className="p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <span
-                        className={`text-xs font-medium px-3 py-1 rounded-full ${statusColor}`}
-                      >
-                        {title}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        #{project.id}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-2">
-                      {project.title}
-                    </h3>
-                    <div className="mt-4 flex space-x-3">
-                      <Link
-                        to={`/view/consent-form/${project.id}`}
-                        className="flex-1 text-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
-                      >
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
+      const pendingForms = data.filter((project) => project.payment === 3);
+      const acceptedForms = data.filter((project) => project.payment === 5);
+      const rejectedForms = data.filter((project) => project.payment === 4);
 
       return (
-        <div className="space-y-8">
-          {renderFormSection(
-            pendingForms,
-            "Pending Forms",
-            "bg-yellow-100 text-yellow-800"
-          )}
-          {renderFormSection(
-            acceptedForms,
-            "Accepted Forms",
-            "bg-green-100 text-green-800"
-          )}
-          {renderFormSection(
-            rejectedForms,
-            "Rejected Forms",
-            "bg-red-100 text-red-800"
-          )}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 text-left">
+                <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                  Project ID
+                </th>
+                <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                  Project Name
+                </th>
+                <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-sm font-semibold text-gray-700">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...pendingForms, ...acceptedForms, ...rejectedForms].map(
+                (project) => (
+                  <tr
+                    key={project.id}
+                    className="hover:bg-blue-50 transition-colors border-b border-gray-100"
+                  >
+                    <td className="px-6 py-4 text-sm font-medium text-gray-700">
+                      #{project.id}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      <div className="font-medium">{project.title}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`text-xs font-medium px-3 py-1 rounded-full ${
+                          project.payment === 3
+                            ? "bg-amber-100 text-amber-800"
+                            : project.payment === 5
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {project.payment === 3
+                          ? "Pending Review"
+                          : project.payment === 5
+                          ? "Accepted"
+                          : "Rejected"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() =>
+                            navigate(`/view/payment-detail/${project.id}`)
+                          }
+                          className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-blue-700"
+                        >
+                          <HiOutlineEye className="text-lg" />
+                          <span>View Details</span>
+                        </button>
+                        <button
+                          onClick={() =>
+                            navigate(`/view/voucher/${project.id}`)
+                          }
+                          className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-blue-700"
+                        >
+                          <HiOutlineEye className="text-lg" />
+                          <span>View voucher</span>
+                        </button>
+                        <button
+                          onClick={() =>
+                            navigate(`/view/project/${project.id}`)
+                          }
+                          className="flex items-center gap-1 px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-indigo-700"
+                        >
+                          <HiFolder className="text-lg" />
+                          <span>View Project</span>
+                        </button>
+                        {project.payment === 3 && (
+                          <>
+                            <button
+                              onClick={() => {
+                                navigate(
+                                  `/create/receipt-voucher/${project.id}`
+                                );
+                              }}
+                              className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-green-700"
+                            >
+                              <CiCirclePlus className="text-lg" />
+                              <span>Generate Receipt</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedForm(project);
+                                setModalType("reject");
+                                setApprovalModal(true);
+                              }}
+                              className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:bg-red-700"
+                            >
+                              <HiX className="text-lg" />
+                              <span>Reject</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
         </div>
       );
     }
@@ -369,21 +416,10 @@ const ConsentForm = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pt-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Consent Forms</h1>
             <p className="text-gray-600 mt-1">
-              Manage your project consent forms
+              Manage your project payment note
             </p>
           </div>
-
-          {role === "PI" && (
-            <Link
-              to="/create/consent-form"
-              className="flex items-center justify-center gap-2 px-5 py-3 mt-4 md:mt-0 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg text-lg font-medium shadow-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-            >
-              <CiCirclePlus size={24} />
-              <span>Create New Form</span>
-            </Link>
-          )}
         </div>
 
         {/* Content Card */}
@@ -393,7 +429,7 @@ const ConsentForm = () => {
             <div className="flex items-center gap-3">
               <HiOutlineClipboardList className="text-blue-600 text-2xl" />
               <h2 className="text-xl font-semibold text-gray-800">
-                Project Forms
+                Project Payment Note
               </h2>
             </div>
           </div>
@@ -431,7 +467,7 @@ const ConsentForm = () => {
             )
           ) : (
             <div className="text-center py-12 text-gray-500">
-              No projects available.
+              No payment note available.
             </div>
           )}
         </div>
@@ -442,4 +478,4 @@ const ConsentForm = () => {
   );
 };
 
-export default ConsentForm;
+export default PaymentDetailView;

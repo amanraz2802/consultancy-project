@@ -1,31 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { ulid } from "ulid";
+import { apiConnector } from "../../services/apiConnectors";
+import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import Spinner from "../spinner/Spinner";
 const PaymentReceiptForm = () => {
-  // Hardcoded department info (to be replaced with backend data later)
-  const departmentInfo = {
-    fullName: "Civil Engineering",
-    shortName: "CE", // This will be used in the document number
-  };
+  const { token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { projectId } = useParams();
+  const [loading, setLoading] = useState(false);
 
-  const getDocPrefix = () => {
-    return `Do${departmentInfo.shortName}`; // Creates format like "DoCE"
-  };
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const confirmSubmit = window.confirm(
       "Are you sure you want to submit the form?"
     );
+    setLoading(true);
     if (confirmSubmit) {
       // Submit the form data
       console.log("Form Submitted:", formData);
+      // Send the updated formData to the backend
+      const response = await apiConnector(
+        "POST",
+        "/form/paymentForm",
+        formData,
+        { draft: "false", Authorization: `Bearer ${token}` }
+      );
+      console.log(response);
+      if (response) {
+        toast.success("Form submitteed successfully");
+        navigate("/home");
+      } else {
+        toast.error("Something went wrong. Please try again");
+      }
 
       setFormData({
         receiptNo: "",
-        year1st: "",
-        year2nd: "",
         date: "",
-        projectNo: "",
+        projectNo: projectId,
         workName: "",
         clientName: "",
         pcName: "",
@@ -48,14 +63,13 @@ const PaymentReceiptForm = () => {
         remark: "",
       });
     }
+    setLoading(false);
   };
-
+  console.log(ulid());
   const [formData, setFormData] = useState({
-    receiptNo: "",
-    year1st: "",
-    year2nd: "",
+    receiptNo: ulid(),
     date: "",
-    projectNo: "",
+    projectNo: projectId,
     workName: "",
     clientName: "",
     pcName: "",
@@ -132,12 +146,7 @@ const PaymentReceiptForm = () => {
       size: 14,
       font: font,
     });
-    page.drawText(`Department of ${departmentInfo.fullName}`, {
-      x: 190,
-      y: height - 90,
-      size: 14,
-      font: boldFont,
-    });
+
     page.drawText("Payment Receipt Approval Note", {
       x: 190,
       y: height - 110,
@@ -170,11 +179,7 @@ const PaymentReceiptForm = () => {
     let yPosition = height - 150;
     const lineHeight = 25;
 
-    drawField(
-      "Project No:",
-      `Do${departmentInfo.shortName}/PaymentReceipt/C-${formData.receiptNo}/${formData.year1st}-${formData.year2nd}`,
-      yPosition
-    );
+    drawField("Receipt No:", `${formData.receiptNo}`, yPosition);
     yPosition -= lineHeight;
     drawField("Date:", formData.date, yPosition);
     yPosition -= lineHeight;
@@ -283,7 +288,9 @@ const PaymentReceiptForm = () => {
       igst: igst.toFixed(2),
     }));
   }, [formData.basicAmount]);
-
+  if (loading) {
+    return <Spinner text={"Submitting data..."} />;
+  }
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <div className="flex">
@@ -299,9 +306,9 @@ const PaymentReceiptForm = () => {
             Sardar Vallabhbhai National Institute of Technology <br /> Surat -
             395007 (GUJARAT)
           </h1>
-          <h3 className="text-xl font-semibold text-center mb-6 -mt-4">
+          {/* <h3 className="text-xl font-semibold text-center mb-6 -mt-4">
             Department of {departmentInfo.fullName}
-          </h3>
+          </h3> */}
         </div>
       </div>
 
@@ -309,54 +316,35 @@ const PaymentReceiptForm = () => {
         Payment Receipt Approval Note
       </h3>
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="text-gray-800 font-semibold text-base mb-4">
-          <span>No. {getDocPrefix()}/Payment Receipt/C-</span>
-          {/* <span>No. DoCE/AKD/Cons/Payment Receipt/C-</span> */}
-          <input
-            type="number"
-            className="border border-gray-300 rounded px-2 py-1 w-18 mx-2"
-            name="receiptNo"
-            value={formData.receiptNo}
-            onChange={handleInputChange}
-            min="1"
-            max="10000"
-            placeholder="####"
-            required
-          />
-          <span>/</span>
-          <input
-            type="number"
-            className="border border-gray-300 rounded px-2 py-1 w-14 mx-2"
-            min="0"
-            max="99"
-            name="year1st"
-            value={formData.year1st}
-            onChange={handleInputChange}
-            placeholder="24"
-            required
-          />
-          <span>-</span>
-          <input
-            type="number"
-            className="border border-gray-300 rounded px-2 py-1 w-14 mx-2"
-            min="0"
-            max="99"
-            name="year2nd"
-            value={formData.year2nd}
-            onChange={handleInputChange}
-            placeholder="25"
-            required
-          />
-          <span className="mx-5"> Date: </span>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleInputChange}
-            className="border border-gray-300 rounded px-2 py-1 w-32 mx-2"
-            placeholder="dd/mm/yyyy"
-            required
-          />
+        <div className="text-gray-800 flex justify-between font-semibold text-base mb-4">
+          {/* <span>No. {getDocPrefix()}/Payment Receipt/C-</span> */}
+          <div>
+            <span>Receipt No: </span>
+            {/* <span>No. DoCE/AKD/Cons/Payment Receipt/C-</span> */}
+            <input
+              type="text"
+              className="border border-gray-300 rounded px-2 py-1 w-72 mx-2"
+              name="receiptNo"
+              value={formData.receiptNo}
+              onChange={handleInputChange}
+              min="1"
+              max="10000"
+              placeholder="123456"
+              required
+            />
+          </div>
+          <div>
+            <span className="mx-5"> Date: </span>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+              className="border border-gray-300 rounded px-2 py-1 w-32 mx-2"
+              placeholder="dd/mm/yyyy"
+              required
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -369,8 +357,8 @@ const PaymentReceiptForm = () => {
               name="projectNo"
               value={formData.projectNo}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
+              className="w-full p-2 border rounded text-gray-500 bold"
+              disabled
             />
           </div>
           <div>

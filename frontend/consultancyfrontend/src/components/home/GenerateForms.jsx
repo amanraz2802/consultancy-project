@@ -8,7 +8,7 @@ import Spinner from "../spinner/Spinner";
 // import "@fontsource/poppins";
 
 function GenerateForms() {
-  const { token } = useSelector((state) => state.auth);
+  const { role, token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -62,27 +62,30 @@ function GenerateForms() {
     <div className="px-4 lg:px-10">
       <h2 className="font-semibold text-lg mt-10 mb-7">Generate Forms:</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {Object.keys(forms).map((key, index) => (
-          <div
-            key={key}
-            className="relative group cursor-pointer"
-            onClick={() => {
-              navigate(`${data[index]?.addPath}`);
-            }}
-          >
-            <div
-              style={{ backgroundColor: colors[index % colors.length] }}
-              className="rounded-md px-4 py-4 h-auto group-hover:opacity-80 transition-all duration-400"
-            >
-              <h3 className="text-base lg:text-lg mb-3 font-poppins break-words">
-                {data[index].name}
-              </h3>
-              <p className="text-3xl text-gray-700 font-bold font-poppins">
-                {forms[key]}
-              </p>
-            </div>
-          </div>
-        ))}
+        {Object.keys(forms).map(
+          (key, index) =>
+            !(role === "DEAN" && data[index].name === "Vouchers") && (
+              <div
+                key={key}
+                className="relative group cursor-pointer"
+                onClick={() => {
+                  navigate(`${data[index]?.addPath}`);
+                }}
+              >
+                <div
+                  style={{ backgroundColor: colors[index % colors.length] }}
+                  className="rounded-md px-4 py-4 h-auto group-hover:opacity-80 transition-all duration-400"
+                >
+                  <h3 className="text-base lg:text-lg mb-3 font-poppins break-words">
+                    {data[index].name}
+                  </h3>
+                  <p className="text-3xl text-gray-700 font-bold font-poppins">
+                    {forms[key]}
+                  </p>
+                </div>
+              </div>
+            )
+        )}
       </div>
     </div>
   );

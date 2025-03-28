@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiPrinter, FiDownload, FiPlus, FiX } from "react-icons/fi";
 import { degrees, PDFDocument, rgb, StandardFonts } from "pdf-lib";
-
+import { useParams } from "react-router-dom";
+import { apiConnector } from "../../services/apiConnectors";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import Spinner from "../spinner/Spinner";
 const InvoiceForm = () => {
+  const { projectId } = useParams();
+  const { token, role } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    projectId: "SVNIT/2024/001",
+    projectId: projectId,
     workName: "",
     billTo: {
       name: "",
@@ -24,14 +33,14 @@ const InvoiceForm = () => {
       {
         description: "",
         sacCode: "",
-        qty: 0,
-        rate: 0,
-        amount: 0,
-        taxableValue: 0,
-        cgst: 0,
-        sgst: 0,
-        igst: 0,
-        total: 0,
+        qty: "0",
+        rate: "0",
+        amount: "0",
+        taxableValue: "0",
+        cgst: "0",
+        sgst: "0",
+        igst: "0",
+        total: "0",
       },
     ],
   });
@@ -44,19 +53,18 @@ const InvoiceForm = () => {
         {
           description: "",
           sacCode: "",
-          qty: 0,
-          rate: 0,
-          amount: 0,
-          taxableValue: 0,
-          cgst: 0,
-          sgst: 0,
-          igst: 0,
-          total: 0,
+          qty: "0",
+          rate: "0",
+          amount: "0",
+          taxableValue: "0",
+          cgst: "0",
+          sgst: "0",
+          igst: "0",
+          total: "0",
         },
       ],
     }));
   };
-
   const removeItem = (indexToRemove) => {
     if (formData.items.length > 1) {
       setFormData((prev) => ({
@@ -105,17 +113,6 @@ const InvoiceForm = () => {
       });
     };
 
-    // // Draw header
-    // drawText(
-    //   "Sardar Vallabhbhai National Institute of Technology, Surat",
-    //   150,
-    //   800,
-    //   {
-    //     font: helveticaBold,
-    //     size: 16,
-    //   }
-    // );
-    // Add logo
     page.drawImage(logoImage, {
       x: 30,
       y: 720,
@@ -245,7 +242,7 @@ const InvoiceForm = () => {
         rowHeight
       );
       drawText(
-        `Rs.${item.rate.toFixed(2)}`,
+        `Rs.${parseFloat(item.rate).toFixed(2)}`,
         currentX + padding,
         currentY + padding
       );
@@ -257,7 +254,7 @@ const InvoiceForm = () => {
         rowHeight
       );
       drawText(
-        `Rs.${item.amount.toFixed(2)}`,
+        `Rs.${parseFloat(item.amount).toFixed(2)}`,
         currentX + padding,
         currentY + padding
       );
@@ -269,7 +266,7 @@ const InvoiceForm = () => {
         rowHeight
       );
       drawText(
-        `Rs.${item.cgst.toFixed(2)}`,
+        `Rs.${parseFloat(item.cgst).toFixed(2)}`,
         currentX + padding,
         currentY + padding
       );
@@ -281,7 +278,7 @@ const InvoiceForm = () => {
         rowHeight
       );
       drawText(
-        `Rs.${item.sgst.toFixed(2)}`,
+        `Rs.${parseFloat(item.sgst).toFixed(2)}`,
         currentX + padding,
         currentY + padding
       );
@@ -293,7 +290,7 @@ const InvoiceForm = () => {
         rowHeight
       );
       drawText(
-        `Rs.${item.total.toFixed(2)}`,
+        `Rs.${parseFloat(item.total).toFixed(2)}`,
         currentX + padding,
         currentY + padding
       );
@@ -311,16 +308,16 @@ const InvoiceForm = () => {
 
     currentY -= 20;
     drawText("Total Amount:", 400, currentY, { font: helveticaBold });
-    drawText(`Rs.${totals.amount.toFixed(2)}`, 480, currentY);
+    drawText(`Rs.${parseFloat(totals.amount).toFixed(2)}`, 480, currentY);
 
     drawText("CGST (9%):", 400, currentY - 20, { font: helveticaBold });
-    drawText(`Rs.${totals.cgst.toFixed(2)}`, 480, currentY - 20);
+    drawText(`Rs.${parseFloat(totals.cgst).toFixed(2)}`, 480, currentY - 20);
 
     drawText("SGST (9%):", 400, currentY - 40, { font: helveticaBold });
-    drawText(`Rs.${totals.sgst.toFixed(2)}`, 480, currentY - 40);
+    drawText(`Rs.${parseFloat(totals.sgst).toFixed(2)}`, 480, currentY - 40);
 
     drawText("Grand Total:", 400, currentY - 60, { font: helveticaBold });
-    drawText(`Rs.${totals.total.toFixed(2)}`, 480, currentY - 60);
+    drawText(`Rs.${parseFloat(totals.total).toFixed(2)}`, 480, currentY - 60);
 
     // Draw note
     drawText("Note:", 50, 80, { font: helveticaBold });
@@ -405,12 +402,17 @@ const InvoiceForm = () => {
       if (field === "rate" || field === "qty") {
         const qty = field === "qty" ? value : newItems[index].qty;
         const rate = field === "rate" ? value : newItems[index].rate;
-        newItems[index].amount = qty * rate;
-        newItems[index].taxableValue = newItems[index].amount;
-        newItems[index].cgst = newItems[index].amount * 0.09;
-        newItems[index].sgst = newItems[index].amount * 0.09;
-        newItems[index].total =
-          newItems[index].amount + newItems[index].cgst + newItems[index].sgst;
+        const amount = Number(qty) * Number(rate);
+
+        newItems[index].amount = amount.toString();
+        newItems[index].taxableValue = amount.toString();
+
+        const cgst = amount * 0.09;
+        const sgst = amount * 0.09;
+
+        newItems[index].cgst = cgst.toString();
+        newItems[index].sgst = sgst.toString();
+        newItems[index].total = (amount + cgst + sgst).toString();
       }
 
       setFormData((prev) => ({ ...prev, items: newItems }));
@@ -423,10 +425,28 @@ const InvoiceForm = () => {
       setFormData((prev) => ({ ...prev, [field]: value }));
     }
   };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form Data:", formData);
+    setLoading(true);
+    try {
+      const response = await apiConnector("POST", `form/billForm`, formData, {
+        draft: "false",
+        Authorization: `Bearer ${token}`,
+      });
+      console.log(response);
+      if (response) {
+        toast.success("Submitted successfully");
+        navigate("/bill-supply");
+      }
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      toast.error(
+        "Something went wrong. Please fill all the details correctly"
+      );
+      setLoading(false);
+    }
   };
 
   const handleDownload = async () => {
@@ -441,7 +461,9 @@ const InvoiceForm = () => {
   };
 
   const totals = calculateTotals();
-
+  if (loading) {
+    return <Spinner text="Submitting form..." />;
+  }
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
       {/* Header */}
@@ -569,7 +591,7 @@ const InvoiceForm = () => {
                     <label className="block text-sm mb-1">SAC Code:</label>
                     <input
                       type="text"
-                      value={item.sacCode}
+                      value={item.sacCode.toString()}
                       onChange={(e) =>
                         handleInputChange(e, null, "sacCode", index)
                       }
@@ -580,7 +602,7 @@ const InvoiceForm = () => {
                     <label className="block text-sm mb-1">Quantity:</label>
                     <input
                       type="number"
-                      value={item.qty}
+                      value={item.qty.toString()}
                       onChange={(e) => handleInputChange(e, null, "qty", index)}
                       className="w-full p-2 border rounded"
                     />
@@ -589,7 +611,7 @@ const InvoiceForm = () => {
                     <label className="block text-sm mb-1">Rate (Rs.):</label>
                     <input
                       type="number"
-                      value={item.rate}
+                      value={item.rate.toString()}
                       onChange={(e) =>
                         handleInputChange(e, null, "rate", index)
                       }
@@ -600,7 +622,7 @@ const InvoiceForm = () => {
                     <label className="block text-sm mb-1">Amount:</label>
                     <input
                       type="number"
-                      value={item.amount}
+                      value={item.amount.toString()}
                       readOnly
                       className="w-full p-2 border rounded bg-gray-100"
                     />
@@ -617,19 +639,19 @@ const InvoiceForm = () => {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span>Total Amount:</span>
-              <span>Rs.{totals.amount.toFixed(2)}</span>
+              <span>Rs.{totals.amount.toFixed(2).toString()}</span>
             </div>
             <div className="flex justify-between">
               <span>CGST (9%):</span>
-              <span>Rs.{totals.cgst.toFixed(2)}</span>
+              <span>Rs.{totals.cgst.toFixed(2).toString()}</span>
             </div>
             <div className="flex justify-between">
               <span>SGST (9%):</span>
-              <span>Rs.{totals.sgst.toFixed(2)}</span>
+              <span>Rs.{totals.sgst.toFixed(2).toString()}</span>
             </div>
             <div className="flex justify-between font-bold">
               <span>Grand Total:</span>
-              <span>Rs.{totals.total.toFixed(2)}</span>
+              <span>Rs.{totals.total.toFixed(2).toString()}</span>
             </div>
           </div>
         </div>

@@ -46,7 +46,8 @@ const Dashboard = () => {
             Authorization: `Bearer ${token}`,
           }
         );
-        console.log(response.data.data);
+
+        // console.log(response.data.data);
         if (response && response.data) {
           const { totalUsers, activeProjects, pendingForms, unreadMessages } =
             response.data.data;

@@ -90,8 +90,6 @@ const WorkFormView = () => {
                 type="number"
                 value={formData.estimatedCost}
                 disabled
-                // min={0}
-                // onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
             </div>

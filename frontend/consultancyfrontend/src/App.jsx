@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import ConsultancyProjectRegistrationForm from "./components/forms/ConsultancyProjectRegistrationForm";
 import Homepage from "./pages/Homepage";
 import Loginpage from "./pages/Loginpage";
+import { Filter } from "lucide-react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import ReusableComponent from "./pages/ReusableComponent";
 import ProjectTable from "./pages/ProjectTable";
@@ -36,6 +37,13 @@ import ComplaintDetails from "./pages/ComplaintDetails.jsx";
 import IndexRoute from "./components/auth/IndexRoute.jsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 import AdminRoute from "./components/auth/AdminRoute.jsx";
+import InvoiceView from "./components/disabledForm/BillFormView.jsx";
+import BillFormView from "./components/disabledForm/BillFormView.jsx";
+import PaymentDetailView from "./components/viewform/Payment.jsx";
+import ReceiptVoucherForm from "./components/forms/ReceiptVoucherForm.jsx";
+import VoucherView from "./components/viewform/Voucher.jsx";
+import ReceiptVoucherViewForm from "./components/disabledForm/VoucherFormView.jsx";
+import LogsDashboard from "./components/admin/LogsDashboard.jsx";
 function App() {
   const { token, role } = useSelector((state) => state.auth);
   return (
@@ -55,6 +63,8 @@ function App() {
         {/* <ProjectTable /> */}
         {/* <ConsentForm /> */}
       </>
+      {/* <PaymentReceiptForm /> */}
+      {/* <BillOfSupply /> */}
       <Routes>
         <Route path="/" element={<IndexRoute />} />
         <Route path="/login" element={<Loginpage />} />
@@ -193,17 +203,114 @@ function App() {
             </OpenRoute>
           }
         />
-
-        {/* <Route
-          path=":formname"
+        {/* ==========================Bill-of-supply routes============================ */}
+        <Route
+          path="bill-supply"
+          element={
+            <OpenRoute>
+              <ReusableComponent
+                title="Projects: Bill of Supply"
+                element={<Bill />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="create/bill-supply/:projectId"
           element={
             <OpenRoute>
               {" "}
-              <ReusableComponent title="" element={<Bill />} />
+              <ReusableComponent
+                title="Bill of Supply"
+                element={<BillOfSupply />}
+              />
             </OpenRoute>
           }
-        /> */}
+        />
 
+        <Route
+          path="/view/bill-supply/:projectId"
+          element={
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Bill of Supply View"
+                element={<BillFormView />}
+              />
+            </OpenRoute>
+          }
+        />
+        {/* ==========================Payment-details routes============================ */}
+        <Route
+          path="payment-detail"
+          element={
+            <OpenRoute>
+              <ReusableComponent
+                title="Projects: Payment Details"
+                element={<PaymentDetailView />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="create/payment-detail/:projectId"
+          element={
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Payment Detail"
+                element={<PaymentReceiptForm />}
+              />
+            </OpenRoute>
+          }
+        />
+
+        <Route
+          path="/view/payment-detail/:projectId"
+          element={
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Payment Detail View"
+                element={<BillFormView />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="create/receipt-voucher/:projectId"
+          element={
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Receipt Voucher"
+                element={<ReceiptVoucherForm />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="voucher"
+          element={
+            <OpenRoute>
+              <ReusableComponent
+                title="Projects: Voucher"
+                element={<VoucherView />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="view/voucher/:projectId"
+          element={
+            <OpenRoute>
+              <ReusableComponent
+                title="Projects: Voucher"
+                element={<ReceiptVoucherViewForm />}
+              />
+            </OpenRoute>
+          }
+        />
         {/* ===================================ADMIN======================================== */}
         <Route
           path="/admin"
@@ -308,6 +415,22 @@ function App() {
             <AdminRoute>
               <AdminDashboard title="Projects">
                 <ProjectSection />
+              </AdminDashboard>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/logs"
+          element={
+            <AdminRoute>
+              <AdminDashboard
+                title={
+                  <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+                    <Filter className="mr-3 text-blue-600" /> Logs Dashboard
+                  </h1>
+                }
+              >
+                <LogsDashboard />
               </AdminDashboard>
             </AdminRoute>
           }

@@ -4,6 +4,8 @@ import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Spinner from "../spinner/Spinner";
+
 const ConsultancyProjectRegistrationForm = ({ view }) => {
   const navigate = useNavigate();
   const { projectId } = useParams();
@@ -20,6 +22,7 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
   const { formId } = useParams();
   const [data, setData] = useState({});
   const [selectedOption, setSelectedOption] = useState("");
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     date: date.toISOString().split("T")[0],
     principalFacultyName: email,
@@ -116,6 +119,7 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
         // to: "hod@svnit.ac.in",
       };
       console.log(form);
+      setLoading(true);
       try {
         console.log(form, "consent form data");
         const response = await apiConnector(
@@ -153,9 +157,11 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
           estimateLetterNo: "",
           proposedLetterNo: "",
         });
+        setLoading(false);
         navigate("/home");
         // alert("Form submitted successfully!");
       } catch (err) {
+        setLoading(false);
         console.log("error in consultancy registration", err);
       }
     }
@@ -173,7 +179,7 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
         assignmentTypes: selectedOption,
       };
       console.log(draftForm);
-
+      setLoading(true);
       try {
         const response = await apiConnector(
           "POST",
@@ -210,14 +216,18 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
           estimateLetterNo: "",
           proposedLetterNo: "",
         });
+        setLoading(false);
         navigate("/home");
       } catch (error) {
         console.error("Error saving draft:", error.response);
+        setLoading(false);
         alert("There was an error saving the draft. Please try again.");
       }
     }
   };
-
+  if (loading) {
+    return <Spinner text="Submitting form..." />;
+  }
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
       {/* <div className="bg-white border-8 border-[#efefef] font-extrabold rounded-3xl p-6  text-3xl font-poppins ">

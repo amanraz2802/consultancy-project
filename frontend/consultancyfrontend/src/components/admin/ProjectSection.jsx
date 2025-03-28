@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaSearch, FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
+import Spinner from "../spinner/Spinner";
 
 const ProjectSection = () => {
   const [projectId, setProjectId] = useState("");

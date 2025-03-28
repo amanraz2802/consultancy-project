@@ -1,167 +1,138 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { FaEye, FaPlus, FaProjectDiagram } from "react-icons/fa";
 
 const WorkOrderView = () => {
   const { token } = useSelector((state) => state.auth);
-  const { formname, projectId } = useParams();
   const navigate = useNavigate();
-  const [data, setData] = useState({});
-  //consent, work, bill,closure, voucher, payment
-  const formtype = {
-    consentForm: {
-      name: "consent-form",
-      check: 0,
-      btn0: "Complete Draft",
-      link: "/create/consent-form/",
-      prefix: "consult",
-    },
-    workOrder: {
-      name: "work-order",
-      check: -1,
-      btn0: "Create Workorder",
-      link: "/create/work-order",
-      prefix: "work",
-    },
-    billOfSupply: {
-      check: -1,
-      name: "bill-supply",
-      btn0: "Create Bill",
-      link: "/create/bill-supply",
-      prefix: "bill",
-      //bill
-    },
-    checkDeposit: {
-      name: "payment",
-      check: -1,
-      btn0: "Create CheckDeposit",
-      link: "/create/check-deposit",
-      prefix: "payment",
-    },
-    closureReport: {
-      name: "closure",
-      check: -1,
-      btn0: "Create Closure",
-      link: "/create/closure-report",
-      prefix: "closure",
-    },
-    finalLetter: {
-      check: -1,
-      btn0: "Create FinalLetter",
-      link: "/create/final-letter",
-    },
-    voucher: {
-      name: "voucher",
-      check: -1,
-      btn0: "Create Voucher",
-      link: "/create/voucher",
-      prefix: "voucher",
-    },
-  };
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchAllForms = async () => {
       try {
         const response = await apiConnector(
           "GET",
-          `/form/getProjects/${formtype[formname].prefix}`,
+          `/form/getProjects/bill`,
           {},
           {
             Authorization: `Bearer ${token}`,
           }
         );
+
         setData(response.data.data || []);
-        console.log(response.data.data);
+        // console.log(response);
+        setIsLoading(false);
       } catch (err) {
         console.error("Error in fetching consent forms:", err);
         setData([]);
+        setIsLoading(false);
       }
     };
 
     fetchAllForms();
-  }, []);
+  }, [token]);
 
   return (
-    <div className="w-9/12 max-w-6xl mx-auto p-4 mt-4">
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden mt-6">
-        <table className="w-full">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                Project ID
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                Project Name
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.length > 0 ? (
-              data.map((project) => (
-                <tr
-                  key={project.projectID}
-                  className="border-b hover:bg-gray-50 cursor-pointer transition-all"
-                >
-                  <td className="px-4 py-3 text-sm font-medium text-gray-700">
-                    {project.id}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {project.title}
-                  </td>
-                  <td className="px-4 py-3">
-                    {/* Conditional Button */}
-                    {project.workStatus === `${formtype[formname].check}` ? (
-                      <td
-                        className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg "
-                        onClick={() =>
-                          navigate(
-                            `/create/${formtype[formname].link}/${project.id}`
-                          )
-                        }
-                      >
-                        {formtype[formname].btn0}
-                      </td>
-                    ) : (
-                      <div className="flex gap-4">
-                        <td
-                          className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold  rounded-lg shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg"
-                          onClick={() =>
-                            navigate(
-                              `/view/${formtype[formname].name}/${project.id}`
-                            )
-                          }
-                        >
-                          View {formtype[formname].name}
-                        </td>
-                        <td
-                          className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg"
-                          onClick={() => navigate("/view/project/18")}
-                        >
-                          View Project
-                        </td>
-                      </div>
-                    )}
+    <div className="container mx-auto px-4 py-8">
+      <div className="bg-white max-w-4xl flex justify-center flex-col mx-auto shadow-xl rounded-2xl overflow-hidden">
+        {/* Page Header */}
+        {/* <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+          <h1 className="text-3xl font-bold text-white flex items-center">
+            <FaProjectDiagram className="mr-4" />
+            Project Bill Management
+          </h1>
+        </div> */}
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-300 border-b-2 border-gray-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Project ID
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Project Name
+                </th>
+                <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {isLoading ? (
+                <tr>
+                  <td colSpan="3" className="text-center py-8">
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div>
+                      <span className="ml-4 text-gray-600">Loading...</span>
+                    </div>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="3"
-                  className="text-center text-gray-500 py-4 text-sm"
-                >
-                  No projects available. yhaha pe hu
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ) : data.length > 0 ? (
+                data.map((project) => (
+                  <tr
+                    key={project.projectID}
+                    className="hover:bg-gray-50 transition-all duration-200"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {project.id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {project.title}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      {project.bill === -1 ? (
+                        <button
+                          onClick={() =>
+                            navigate(`/create/bill-supply/${project.id}`)
+                          }
+                          className="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300"
+                        >
+                          <FaPlus className="mr-2" />
+                          Create Bill
+                        </button>
+                      ) : (
+                        <div className="flex justify-center space-x-4">
+                          <button
+                            onClick={() =>
+                              navigate(`/view/bill-supply/${project.id}`)
+                            }
+                            className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-300"
+                          >
+                            <FaEye className="mr-2" />
+                            View Bill
+                          </button>
+                          <button
+                            onClick={() =>
+                              navigate(`/view/project/${project.id}`)
+                            }
+                            className="inline-flex items-center px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors duration-300"
+                          >
+                            <FaProjectDiagram className="mr-2" />
+                            View Project
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="3"
+                    className="text-center text-gray-500 py-8 text-sm"
+                  >
+                    No projects available.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

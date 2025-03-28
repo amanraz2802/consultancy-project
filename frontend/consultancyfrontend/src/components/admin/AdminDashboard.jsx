@@ -3,7 +3,7 @@ import { FaCircleUser } from "react-icons/fa6";
 import { HiOutlineDownload } from "react-icons/hi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { MdNotifications, MdDashboard } from "react-icons/md";
-import { FaEdit, FaUsersCog, FaFileAlt } from "react-icons/fa";
+import { FaEdit, FaUsersCog, FaFileAlt, FaHistory } from "react-icons/fa";
 import { LuLogOut } from "react-icons/lu";
 import { IoHome } from "react-icons/io5";
 import { MdContacts, MdExpandMore, MdExpandLess } from "react-icons/md";
@@ -209,6 +209,17 @@ const AdminDashboard = ({ children, title }) => {
               <FaFileAlt className="w-6 h-6" />
               {!isExpandable && (
                 <span className="hidden lg:block ml-2">Projects</span>
+              )}
+            </Link>
+            <Link
+              to="/admin/logs"
+              className={`flex items-center rounded-2xl py-3 px-4 ${
+                isActive("/admin/logs") ? "bg-[#34357c]" : ""
+              }`}
+            >
+              <FaHistory className="w-6 h-6" />
+              {!isExpandable && (
+                <span className="hidden lg:block ml-2">Logs</span>
               )}
             </Link>
           </div>

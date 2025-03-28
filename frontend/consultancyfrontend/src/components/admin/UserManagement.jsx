@@ -4,6 +4,7 @@ import { FaFilter } from "react-icons/fa6";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import Spinner from "../spinner/Spinner";
 const UserManagement = () => {
   // Mock data for users
 
@@ -15,16 +16,22 @@ const UserManagement = () => {
       dept: filterDept,
       role: filterRole,
     };
-    const response = await apiConnector("POST", "/admin/users", filterdata, {
-      Authorization: `Bearer ${token}`,
-    });
-    console.log(response);
-    const data = response.data.data.map((user) => ({
-      ...user,
-      name: user.fname + user.lname,
-      id: user.email,
-    }));
-    setUsers(data);
+    try {
+      setLoading(true);
+      const response = await apiConnector("POST", "/admin/users", filterdata, {
+        Authorization: `Bearer ${token}`,
+      });
+      console.log(response);
+      const data = response.data.data.map((user) => ({
+        ...user,
+        name: user.fname + user.lname,
+        id: user.email,
+      }));
+      setUsers(data);
+      setLoading(false);
+    } catch (err) {
+      console.log(err), setLoading(false);
+    }
   }
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
@@ -45,31 +52,41 @@ const UserManagement = () => {
 
   async function handleFreeze(id) {
     setLoading(true);
-    const response = await apiConnector(
-      "POST",
-      `/admin/user/${encodeURIComponent(id)}/freeze`,
-      {},
-      {
-        Authorization: `Bearer ${token}`,
-      }
-    );
-    console.log(response);
-    handleFilter();
-    setLoading(false);
+    try {
+      const response = await apiConnector(
+        "POST",
+        `/admin/user/${encodeURIComponent(id)}/freeze`,
+        {},
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      console.log(response);
+      handleFilter();
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+    }
   }
   async function handleUnfreeze(id) {
-    setLoading(true);
-    const response = await apiConnector(
-      "POST",
-      `/admin/user/${encodeURIComponent(id)}/unfreeze`,
-      {},
-      {
-        Authorization: `Bearer ${token}`,
-      }
-    );
-    console.log(response);
-    handleFilter();
-    setLoading(false);
+    try {
+      setLoading(true);
+      const response = await apiConnector(
+        "POST",
+        `/admin/user/${encodeURIComponent(id)}/unfreeze`,
+        {},
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      console.log(response);
+      handleFilter();
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+    }
   }
   if (loading) {
     return <Spinner text={"Please wait a moment..."} />;

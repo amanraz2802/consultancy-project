@@ -4,10 +4,12 @@ import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../spinner/Spinner";
 const WorkOrderFormPage = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
   const { token } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(false);
   const [fileUrl, setFileUrl] = useState("");
 
   // Manage form data using useState
@@ -52,7 +54,7 @@ const WorkOrderFormPage = () => {
       toast.error("Please select a file to upload.");
       return;
     }
-
+    setLoading(true);
     const fileFormData = new FormData();
     fileFormData.append("file", formData.file);
     fileFormData.append("resource_type", "raw");
@@ -98,6 +100,7 @@ const WorkOrderFormPage = () => {
           },
           { draft: "false", Authorization: `Bearer ${token}` }
         );
+
         navigate("/work-order");
         toast.success(response.data.message);
 
@@ -112,12 +115,16 @@ const WorkOrderFormPage = () => {
       } else {
         toast.error("Upload failed.");
       }
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error("Error uploading file:", error);
       toast.error("File upload failed.");
     }
   };
-
+  if (loading) {
+    return <Spinner text={"Submitting form..."} />;
+  }
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto px-4 py-8">

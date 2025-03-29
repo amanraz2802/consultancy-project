@@ -37,6 +37,7 @@ function GoogleSignInButton() {
       dispatch(setEmail(response.data.data.email));
       dispatch(setName(response.data.data.name));
       dispatch(setRole(response.data.data.role));
+      console.log(response.status, "in login");
       if (response) {
         if (response.data.data.role === "ADMIN") navigate("/admin");
         else if (
@@ -49,7 +50,8 @@ function GoogleSignInButton() {
       }
       console.log();
     } catch (error) {
-      toast.error(response.data.message);
+      // toast.error(response.data.message);
+      // console.log(error.status, "status");
       console.error("Login error:", error);
     }
   };

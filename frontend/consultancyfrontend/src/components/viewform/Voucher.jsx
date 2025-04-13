@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import Spinner from "../spinner/Spinner";
 import {
   HiCheck,
   HiX,
@@ -121,6 +122,10 @@ const VoucherView = () => {
 
     return null;
   };
+
+  if (isLoading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen pb-12">

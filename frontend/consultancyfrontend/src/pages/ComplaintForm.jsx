@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { apiConnector } from "../services/apiConnectors";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import Spinner from "../components/spinner/Spinner";
 
 const ComplaintForm = () => {
   // Sample project data that would normally come from user's previous projects
   const [projects, setProjects] = useState([]);
   const { token } = useSelector((state) => state.auth);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setloading] = useState(false);
 
   useEffect(() => {
     async function fetchProject() {
+      setIsLoading(true);
       const response = await apiConnector(
         "GET",
         "/user/projects",
@@ -20,8 +24,10 @@ const ComplaintForm = () => {
       );
       setProjects(response.data.data);
       console.log(response);
+      setIsLoading(false);
     }
     fetchProject();
+    // setIsLoading(false);
   }, []);
   const [formData, setFormData] = useState({
     projectId: "",
@@ -40,6 +46,7 @@ const ComplaintForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Would normally send data to backend
+    setloading(true);
     try {
       const response = await apiConnector("POST", "/user/complain", formData, {
         Authorization: `Bearer ${token}`,
@@ -49,6 +56,7 @@ const ComplaintForm = () => {
       }
     } catch (err) {
       console.log(err, "In submitting complaint form");
+      setloading(false);
     }
 
     // Reset form
@@ -57,8 +65,14 @@ const ComplaintForm = () => {
       subject: "",
       body: "",
     });
+    setloading(false);
   };
-
+  if (isLoading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
+  }
+  if (loading) {
+    return <Spinner text={"Submitting form..."} />;
+  }
   return (
     <div className="w-full bg-gray-100 pt-12 px-4 sm:px-6 lg:px-8">
       <div className="w-[50%] h-[50%] mx-auto bg-white rounded-lg shadow-md overflow-hidden">

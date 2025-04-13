@@ -112,9 +112,10 @@ const WorkOrderFormPage = () => {
           projectId: projectId,
           path: "",
         });
-      } else {
-        toast.error("Upload failed.");
       }
+      // else {
+      //   toast.error("Upload failed.");
+      // }
       setLoading(false);
     } catch (error) {
       setLoading(false);

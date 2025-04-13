@@ -4,10 +4,13 @@ import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import Spinner from "../spinner/Spinner";
 
 const WorkFormView = () => {
   const { projectId } = useParams();
   const { token } = useSelector((state) => state.auth);
+
+  const [loading, setLoading] = useState(false);
 
   // Manage form data using useState
   const [formData, setFormData] = useState({
@@ -19,6 +22,7 @@ const WorkFormView = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         console.log(projectId);
         const response = await apiConnector(
@@ -41,12 +45,18 @@ const WorkFormView = () => {
         });
         console.log("Form Data: ", formData);
       } catch (error) {
+        setLoading(false);
         console.error("Error fetching data:", error);
       }
+      setLoading(false);
     };
 
     fetchData();
   }, [projectId, token]);
+
+  if (loading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">

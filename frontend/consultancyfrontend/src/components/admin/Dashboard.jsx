@@ -3,6 +3,7 @@ import { FaUsers, FaFileAlt, FaCheck, FaTimes } from "react-icons/fa";
 import { MdContactMail } from "react-icons/md";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
+import Spinner from "../spinner/Spinner";
 const Dashboard = () => {
   const { token } = useSelector((state) => state.auth);
   // Mock data for dashboard stats
@@ -31,9 +32,7 @@ const Dashboard = () => {
   // Mock data for recent activities
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(false);
-  if (loading) {
-    return <Spinner text={"Please wait a moment..."} />;
-  }
+
   useEffect(() => {
     setLoading(true);
     async function fetchDashboard() {
@@ -88,6 +87,9 @@ const Dashboard = () => {
     fetchDashboard();
     setLoading(false);
   }, []);
+  if (loading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
+  }
   return (
     <div className="space-y-8">
       {/* Stats */}
@@ -132,12 +134,12 @@ const Dashboard = () => {
                   <td className="py-3 px-4">
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        activity.status === "approved"
+                        activity.status === "Completed"
                           ? "bg-green-100 text-green-800"
-                          : activity.status === "rejected"
+                          : activity.status === "Rejected"
                           ? "bg-red-100 text-red-800"
-                          : activity.status === "ongoing"
-                          ? "bg-yellow-100 text-blue-800"
+                          : activity.status == "Ongoing"
+                          ? "bg-yellow-200 text-blue-800"
                           : "bg-gray-500 text-white"
                       }`}
                     >

@@ -13,6 +13,7 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import { apiConnector } from "../services/apiConnectors";
 import { useSelector } from "react-redux";
+import Spinner from "../components/spinner/Spinner";
 
 const ComplaintDetails = () => {
   const { id } = useParams();
@@ -94,18 +95,9 @@ const ComplaintDetails = () => {
     navigate(-1);
   };
 
-  // Render loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader className="w-12 h-12 text-blue-600 animate-spin mx-auto" />
-          <p className="mt-4 text-gray-600">Loading complaint details...</p>
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
   }
-
   // Render error state
   if (error || !complaintData || !complaintData.data) {
     return (

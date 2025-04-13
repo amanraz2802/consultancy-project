@@ -41,11 +41,12 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
     estimateLetterNo: "",
     proposedLetterNo: "",
   });
-
+  const [loading1, setLoading1] = useState(false);
   {
     projectId &&
       useEffect(() => {
         const fetchData = async () => {
+          setLoading1(true);
           try {
             const response = await apiConnector(
               "GET",
@@ -59,7 +60,9 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
             setData(response.data.data);
           } catch (error) {
             console.error("Error fetching data:", error);
+            setLoading1(false);
           }
+          setLoading1(false);
         };
 
         if (projectId) {
@@ -67,7 +70,9 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
         }
       }, [projectId]);
   }
-
+  if (loading1) {
+    return <Spinner text={"Preparing your dashboard..."} />;
+  }
   // Update formData whenever data changes
   useEffect(() => {
     if (data) {

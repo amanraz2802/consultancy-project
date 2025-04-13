@@ -89,7 +89,7 @@ const UserManagement = () => {
     }
   }
   if (loading) {
-    return <Spinner text={"Please wait a moment..."} />;
+    return <Spinner text={"One moment, please..."} />;
   }
   return (
     <div className="space-y-6">

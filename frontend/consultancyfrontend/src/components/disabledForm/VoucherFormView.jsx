@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { apiConnector } from "../../services/apiConnectors";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../spinner/Spinner";
 
 const ReceiptVoucherViewForm = () => {
   const navigate = useNavigate();
@@ -207,11 +208,7 @@ const ReceiptVoucherViewForm = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
-      </div>
-    );
+    return <Spinner text={"Preparing your dashboard..."} />;
   }
 
   if (error) {

@@ -3,8 +3,10 @@ import { FaSearch, FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import Spinner from "../spinner/Spinner";
+import { useNavigate } from "react-router-dom";
 
 const ProjectSection = () => {
+  const navigate = useNavigate();
   const [projectId, setProjectId] = useState("");
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -69,7 +71,7 @@ const ProjectSection = () => {
     setLoading(false);
   };
   if (loading) {
-    return <Spinner text={"Please wait a moment..."} />;
+    return <Spinner text={"One moment, please..."} />;
   }
   return (
     <div className="space-y-6">
@@ -145,7 +147,13 @@ const ProjectSection = () => {
                           className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
                           title="View Details"
                         >
-                          <FaEye />
+                          <FaEye
+                            onClick={() => {
+                              navigate(
+                                `/admin/view/project/${project.projectId}`
+                              );
+                            }}
+                          />
                         </button>
                         <button
                           className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"

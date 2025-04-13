@@ -2,16 +2,12 @@ import React, { useState, useEffect } from "react";
 import Spinner from "../spinner/Spinner";
 import { useSelector } from "react-redux";
 import { FaEye } from "react-icons/fa";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { apiConnector } from "../../services/apiConnectors";
+import { apiConnector } from "../../services/apiConnectors.jsx";
 
-const ConsultancyProjectCompletionReport = () => {
-  const navigate = useNavigate();
+const ConsultancyProjectCompletionReportView = () => {
   const { projectId } = useParams();
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const { token } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
     consultancyProjectNo: "",
@@ -26,15 +22,14 @@ const ConsultancyProjectCompletionReport = () => {
     manpowerHiredTo: "",
     publicationsPublished: "",
     patentsFiled: "",
-    researchStudents: [],
     pendingAdvances: "",
     disbursementsComplete: "",
-    finalReportAttached: false,
+    finalReportAttached: true,
+    fileUrl: "",
   });
 
   const [payments, setPayments] = useState([]);
-  const [fileUploaded, setFileUploaded] = useState(false);
-  const [fileUrl, setFileUrl] = useState("abcd");
+  const [researchStudents, setResearchStudents] = useState([]);
 
   // Fetch project data on component mount
   useEffect(() => {
@@ -43,35 +38,47 @@ const ConsultancyProjectCompletionReport = () => {
       try {
         const response = await apiConnector(
           "GET",
-          `/form/prefetch/closure/${projectId}`,
+          `/form/closureForm/${projectId}`,
           {},
           { Authorization: `Bearer ${token}` }
         );
-        console.log(response);
-        if (response.data && response.data.data) {
-          const {
-            consultancyProjectNo,
-            nameOfWork,
-            nameOfPI,
-            departmentSection,
-            payments,
-          } = response.data.data;
 
-          setFormData((prevData) => ({
-            ...prevData,
-            consultancyProjectNo,
-            nameOfWork,
-            nameOfPI,
-            departmentSection,
-          }));
+        console.log(response, "get closure form");
+        console.log(response.data?.researchStudents, "students");
+        console.log(
+          response.data.paymentDetails.consultancyProjectNo,
+          "projectNo"
+        );
+        setResearchStudents(response.data?.researchStudents || null);
+        setPayments(response.data.paymentDetails.payments || null);
+        setFormData({
+          consultancyProjectNo:
+            response.data.paymentDetails.consultancyProjectNo,
+          nameOfWork: response.data.paymentDetails.nameOfWork,
+          nameOfPI: response.data.paymentDetails.nameOfPI,
+          departmentSection: response.data.paymentDetails.departmentSection,
+          objectivesAchieved: response.data.closureForm.objectivesAchieved,
+          objectivesUnfulfilled:
+            response.data.closureForm.objectivesUnfulfilled,
+          manpowerAssociatedFrom:
+            response.data.closureForm.manpowerAssociatedFrom,
+          manpowerAssociatedTo: response.data.closureForm.manpowerAssociatedTo,
+          manpowerHiredFrom: response.data.closureForm.manpowerHiredFrom,
+          manpowerHiredTo: response.data.closureForm.manpowerHiredTo,
+          publicationsPublished:
+            response.data.closureForm.publicationsPublished,
+          patentsFiled: response.data.closureForm.patentsFiled,
+          pendingAdvances: response.data.closureForm.pendingAdvances,
+          disbursementsComplete:
+            response.data.closureForm.disbursementsComplete,
+          finalReportAttached: true,
+          fileUrl: response.data.closureForm.fileUrl,
+        });
 
-          if (payments && payments.length > 0) {
-            setPayments(payments);
-          }
-        }
+        // This would be used in a real implementation to set the data from the API response
+        // For now, we're using the hardcoded data from the JSON you provided
       } catch (error) {
         console.error("Error fetching project data:", error);
-        toast.error("Failed to load project data");
       } finally {
         setLoading(false);
       }
@@ -80,126 +87,11 @@ const ConsultancyProjectCompletionReport = () => {
     fetchProjectData();
   }, [projectId, token]);
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleAddStudent = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      researchStudents: [
-        ...prevData.researchStudents,
-        { name: "", studentId: "", type: "" },
-      ],
-    }));
-  };
-
-  const handleRemoveStudent = (indexToRemove) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      researchStudents: prevData.researchStudents.filter(
-        (_, index) => index !== indexToRemove
-      ),
-    }));
-  };
-
-  const handleResearchStudentChange = (index, field, value) => {
-    setFormData((prevData) => {
-      const newResearchStudents = [...prevData.researchStudents];
-      newResearchStudents[index] = {
-        ...newResearchStudents[index],
-        [field]: value,
-      };
-      return { ...prevData, researchStudents: newResearchStudents };
-    });
-  };
-
-  const handleFileUpload = (e) => {
-    if (e.target.files.length > 0) {
-      setFileUploaded(true);
-      // Here you would typically handle file upload to a server
-      // and get back a URL to store in fileUrl
-      // For now, we'll just set a placeholder
-      setFileUrl("file-uploaded");
-      setFormData((prevData) => ({ ...prevData, finalReportAttached: true }));
-    } else {
-      setFileUploaded(false);
-      setFileUrl("");
-      setFormData((prevData) => ({ ...prevData, finalReportAttached: false }));
-    }
-  };
-
   const getTotalNetPaymentReceived = () => {
     return payments.reduce(
       (sum, payment) => sum + Number(payment.netPaymentReceived || 0),
       0
     );
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    setSubmitting(true);
-
-    try {
-      const formDataToSubmit = new FormData();
-      formDataToSubmit.set("objectivesAchieved", formData.objectivesAchieved);
-      formDataToSubmit.set(
-        "objectivesUnfulfilled",
-        formData.objectivesUnfulfilled
-      );
-      formDataToSubmit.set(
-        "manpowerAssociatedFrom",
-        formData.manpowerAssociatedFrom
-      );
-      formDataToSubmit.set(
-        "manpowerAssociatedTo",
-        formData.manpowerAssociatedTo
-      );
-      formDataToSubmit.set("manpowerHiredFrom", formData.manpowerHiredFrom);
-      formDataToSubmit.set("manpowerHiredTo", formData.manpowerHiredTo);
-      formDataToSubmit.set(
-        "publicationsPublished",
-        formData.publicationsPublished
-      );
-      formDataToSubmit.set("patentsFiled", formData.patentsFiled);
-      formDataToSubmit.set(
-        "researchStudents",
-        JSON.stringify(formData.researchStudents)
-      );
-      formDataToSubmit.set("projectId", projectId);
-      formDataToSubmit.set("pendingAdvances", formData.pendingAdvances);
-      formDataToSubmit.set(
-        "disbursementsComplete",
-        formData.disbursementsComplete
-      );
-      formDataToSubmit.set("finalReportAttached", formData.finalReportAttached);
-      formDataToSubmit.set("fileUrl", fileUrl);
-
-      const response = await apiConnector(
-        "POST",
-        "/form/closureForm",
-        formDataToSubmit,
-        {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        }
-      );
-      console.log(response);
-      if (response.data) {
-        toast.success("Form submitted successfully");
-        navigate("/home");
-      }
-    } catch (err) {
-      console.error("Error submitting closure form:", err);
-      toast.error("Failed to submit form");
-    } finally {
-      setSubmitting(false);
-    }
   };
 
   const formatDate = (dateString) => {
@@ -213,11 +105,7 @@ const ConsultancyProjectCompletionReport = () => {
   };
 
   if (loading) {
-    return <Spinner text="Preparing your dashboard..." />;
-  }
-
-  if (submitting) {
-    return <Spinner text="Submitting form..." />;
+    return <Spinner text={"Preparing your dashboard..."} />;
   }
 
   return (
@@ -251,23 +139,7 @@ const ConsultancyProjectCompletionReport = () => {
       <h1 className="text-2xl font-bold mb-6 text-center underline">
         CLOSURE REPORT
       </h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4 flex gap-8">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mt-2">
-              Date
-            </label>
-          </div>
-          <div>
-            <input
-              type="text"
-              value={formatDate(new Date())}
-              readOnly
-              className="block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
-            />
-          </div>
-        </div>
-
+      <div>
         {/* Prefetched Read-only Fields */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
@@ -277,7 +149,7 @@ const ConsultancyProjectCompletionReport = () => {
             type="text"
             value={formData.consultancyProjectNo}
             readOnly
-            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
           />
         </div>
 
@@ -289,7 +161,7 @@ const ConsultancyProjectCompletionReport = () => {
             type="text"
             value={formData.nameOfWork}
             readOnly
-            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
           />
         </div>
 
@@ -301,7 +173,7 @@ const ConsultancyProjectCompletionReport = () => {
             type="text"
             value={formData.nameOfPI}
             readOnly
-            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
           />
         </div>
 
@@ -313,7 +185,7 @@ const ConsultancyProjectCompletionReport = () => {
             type="text"
             value={formData.departmentSection}
             readOnly
-            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
           />
         </div>
 
@@ -405,19 +277,16 @@ const ConsultancyProjectCompletionReport = () => {
           </div>
         </div>
 
-        {/* User Editable Fields */}
+        {/* User Filled Fields - Now Read Only */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Objectives Achieved
           </label>
           <textarea
-            name="objectivesAchieved"
             value={formData.objectivesAchieved}
-            onChange={handleInputChange}
-            maxLength={1000}
+            readOnly
             rows={4}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
-            required
+            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
           />
         </div>
 
@@ -426,12 +295,10 @@ const ConsultancyProjectCompletionReport = () => {
             Objectives Unfulfilled
           </label>
           <textarea
-            name="objectivesUnfulfilled"
             value={formData.objectivesUnfulfilled}
-            onChange={handleInputChange}
-            maxLength={1000}
+            readOnly
             rows={4}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+            className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
           />
         </div>
 
@@ -441,12 +308,10 @@ const ConsultancyProjectCompletionReport = () => {
               Manpower Associated From
             </label>
             <input
-              type="date"
-              name="manpowerAssociatedFrom"
-              value={formData.manpowerAssociatedFrom}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
-              required
+              type="text"
+              value={formatDate(formData.manpowerAssociatedFrom)}
+              readOnly
+              className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
             />
           </div>
           <div>
@@ -454,12 +319,10 @@ const ConsultancyProjectCompletionReport = () => {
               Manpower Associated To
             </label>
             <input
-              type="date"
-              name="manpowerAssociatedTo"
-              value={formData.manpowerAssociatedTo}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
-              required
+              type="text"
+              value={formatDate(formData.manpowerAssociatedTo)}
+              readOnly
+              className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
             />
           </div>
         </div>
@@ -470,11 +333,10 @@ const ConsultancyProjectCompletionReport = () => {
               Manpower Hired From
             </label>
             <input
-              type="date"
-              name="manpowerHiredFrom"
-              value={formData.manpowerHiredFrom}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+              type="text"
+              value={formatDate(formData.manpowerHiredFrom)}
+              readOnly
+              className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
             />
           </div>
           <div>
@@ -482,11 +344,10 @@ const ConsultancyProjectCompletionReport = () => {
               Manpower Hired To
             </label>
             <input
-              type="date"
-              name="manpowerHiredTo"
-              value={formData.manpowerHiredTo}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+              type="text"
+              value={formatDate(formData.manpowerHiredTo)}
+              readOnly
+              className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
             />
           </div>
         </div>
@@ -499,22 +360,19 @@ const ConsultancyProjectCompletionReport = () => {
               <label className="inline-flex items-center mr-4">
                 <input
                   type="radio"
-                  name="publicationsPublished"
-                  value="yes"
                   checked={formData.publicationsPublished === "yes"}
-                  onChange={handleInputChange}
+                  readOnly
+                  disabled
                   className="form-radio"
-                  required
                 />
                 <span className="ml-2">Yes</span>
               </label>
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  name="publicationsPublished"
-                  value="no"
                   checked={formData.publicationsPublished === "no"}
-                  onChange={handleInputChange}
+                  readOnly
+                  disabled
                   className="form-radio"
                 />
                 <span className="ml-2">No</span>
@@ -527,22 +385,21 @@ const ConsultancyProjectCompletionReport = () => {
               <label className="inline-flex items-center mr-4">
                 <input
                   type="radio"
-                  name="patentsFiled"
-                  value="yes"
                   checked={formData.patentsFiled === "yes"}
-                  onChange={handleInputChange}
+                  readOnly
+                  disabled
                   className="form-radio"
-                  required
                 />
                 <span className="ml-2">Yes</span>
               </label>
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  name="patentsFiled"
-                  value="no"
-                  checked={formData.patentsFiled === "no"}
-                  onChange={handleInputChange}
+                  checked={
+                    formData.patentsFiled === "no" || !formData.patentsFiled
+                  }
+                  readOnly
+                  disabled
                   className="form-radio"
                 />
                 <span className="ml-2">No</span>
@@ -556,40 +413,14 @@ const ConsultancyProjectCompletionReport = () => {
             <h2 className="text-lg font-semibold">
               Research Students Supported
             </h2>
-            <button
-              type="button"
-              onClick={handleAddStudent}
-              className="px-4 py-2 bg-[#734b9e] text-white rounded-md hover:bg-[#574092] focus:outline-none focus:ring-2 focus:ring-offset-2"
-            >
-              Add Student
-            </button>
           </div>
 
-          {formData.researchStudents.length > 0 ? (
-            formData.researchStudents.map((student, index) => (
+          {researchStudents.length > 0 ? (
+            researchStudents.map((student, index) => (
               <div
                 key={index}
                 className="mb-4 p-4 border rounded-lg bg-gray-50 relative"
               >
-                <button
-                  type="button"
-                  onClick={() => handleRemoveStudent(index)}
-                  className="absolute top-2 right-2 text-red-600 hover:text-red-800"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div className="mb-2">
                     <label className="block text-sm font-medium text-gray-700">
@@ -598,16 +429,8 @@ const ConsultancyProjectCompletionReport = () => {
                     <input
                       type="text"
                       value={student.name}
-                      onChange={(e) =>
-                        handleResearchStudentChange(
-                          index,
-                          "name",
-                          e.target.value
-                        )
-                      }
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
-                      placeholder="Enter student name"
-                      required
+                      readOnly
+                      className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
                     />
                   </div>
 
@@ -618,16 +441,8 @@ const ConsultancyProjectCompletionReport = () => {
                     <input
                       type="text"
                       value={student.studentId}
-                      onChange={(e) =>
-                        handleResearchStudentChange(
-                          index,
-                          "studentId",
-                          e.target.value
-                        )
-                      }
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
-                      placeholder="Enter student ID"
-                      required
+                      readOnly
+                      className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm"
                     />
                   </div>
                 </div>
@@ -640,34 +455,19 @@ const ConsultancyProjectCompletionReport = () => {
                     <label className="inline-flex items-center">
                       <input
                         type="radio"
-                        name={`studentType${index}`}
-                        value="Research Scholar"
                         checked={student.type === "Research Scholar"}
-                        onChange={(e) =>
-                          handleResearchStudentChange(
-                            index,
-                            "type",
-                            e.target.value
-                          )
-                        }
+                        readOnly
+                        disabled
                         className="form-radio"
-                        required
                       />
                       <span className="ml-2">Research Scholar</span>
                     </label>
                     <label className="inline-flex items-center">
                       <input
                         type="radio"
-                        name={`studentType${index}`}
-                        value="M.Tech Student"
                         checked={student.type === "M.Tech Student"}
-                        onChange={(e) =>
-                          handleResearchStudentChange(
-                            index,
-                            "type",
-                            e.target.value
-                          )
-                        }
+                        readOnly
+                        disabled
                         className="form-radio"
                       />
                       <span className="ml-2">M.Tech Student</span>
@@ -678,8 +478,7 @@ const ConsultancyProjectCompletionReport = () => {
             ))
           ) : (
             <p className="text-gray-500 text-center py-4">
-              No research students added. Click the "Add Student" button to add
-              students.
+              No research students added.
             </p>
           )}
         </div>
@@ -695,22 +494,19 @@ const ConsultancyProjectCompletionReport = () => {
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  name="pendingAdvances"
-                  value="yes"
                   checked={formData.pendingAdvances === "yes"}
-                  onChange={handleInputChange}
+                  readOnly
+                  disabled
                   className="form-radio text-cyan-600"
-                  required
                 />
                 <span className="ml-2">Yes</span>
               </label>
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  name="pendingAdvances"
-                  value="no"
                   checked={formData.pendingAdvances === "no"}
-                  onChange={handleInputChange}
+                  readOnly
+                  disabled
                   className="form-radio text-cyan-600"
                 />
                 <span className="ml-2">No</span>
@@ -726,22 +522,19 @@ const ConsultancyProjectCompletionReport = () => {
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  name="disbursementsComplete"
-                  value="yes"
                   checked={formData.disbursementsComplete === "yes"}
-                  onChange={handleInputChange}
+                  readOnly
+                  disabled
                   className="form-radio text-cyan-600"
-                  required
                 />
                 <span className="ml-2">Yes</span>
               </label>
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  name="disbursementsComplete"
-                  value="no"
                   checked={formData.disbursementsComplete === "no"}
-                  onChange={handleInputChange}
+                  readOnly
+                  disabled
                   className="form-radio text-cyan-600"
                 />
                 <span className="ml-2">No</span>
@@ -752,39 +545,31 @@ const ConsultancyProjectCompletionReport = () => {
 
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Final Report</h2>
-          <label className="flex items-center">
-            <input
-              type="file"
-              onChange={handleFileUpload}
-              className="form-input"
-              required={!fileUploaded}
-            />
-          </label>
-          <label className="flex items-center mt-2">
+          <div className="flex items-center mt-2">
             <input
               type="checkbox"
-              name="finalReportAttached"
               checked={formData.finalReportAttached}
-              onChange={handleInputChange}
+              readOnly
+              disabled
               className="form-checkbox"
-              required
             />
             <span className="ml-2">
               A Copy of the Final Report submitted to the Client, duly
               counter-signed by the Dean (R&C) is attached herewith.
             </span>
-          </label>
+          </div>
+          {formData.fileUrl && (
+            <div className="mt-2 p-2 bg-gray-50 border rounded">
+              <p className="flex items-center">
+                <FaEye className="mr-2" />
+                <span>Attachment: {formData.fileUrl}</span>
+              </p>
+            </div>
+          )}
         </div>
-
-        <button
-          type="submit"
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#3e1b86] hover:bg-[#5f26a9] focus:outline-none focus:ring-2 focus:ring-offset-2"
-        >
-          Submit
-        </button>
-      </form>
+      </div>
     </div>
   );
 };
 
-export default ConsultancyProjectCompletionReport;
+export default ConsultancyProjectCompletionReportView;

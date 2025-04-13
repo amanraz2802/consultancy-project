@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { CiCirclePlus } from "react-icons/ci";
 import toast from "react-hot-toast";
+import Spinner from "../spinner/Spinner";
 import {
   HiCheck,
   HiX,
@@ -52,7 +53,7 @@ const ConsentForm = () => {
 
   const handleApprovalAction = async (action) => {
     if (!selectedForm) return;
-
+    setIsLoading(true);
     try {
       const endpoint =
         action === "accept"
@@ -86,7 +87,9 @@ const ConsentForm = () => {
     } catch (error) {
       console.error("Error in approval action:", error);
       toast.error("Reviewed failed");
+      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   const ApprovalModal = () => (
@@ -362,7 +365,9 @@ const ConsentForm = () => {
 
     return null;
   };
-
+  if (isLoading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
+  }
   return (
     <div className="bg-gray-50 min-h-screen pb-12">
       <div className="max-w-6xl mx-auto p-6">

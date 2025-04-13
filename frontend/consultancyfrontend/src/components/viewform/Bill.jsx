@@ -3,15 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import { FaEye, FaPlus, FaProjectDiagram } from "react-icons/fa";
+import Spinner from "../spinner/Spinner";
 
 const WorkOrderView = () => {
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchAllForms = async () => {
+      setIsLoading(true);
       try {
         const response = await apiConnector(
           "GET",
@@ -35,6 +37,9 @@ const WorkOrderView = () => {
     fetchAllForms();
   }, [token]);
 
+  if (isLoading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
+  }
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="bg-white max-w-4xl flex justify-center flex-col mx-auto shadow-xl rounded-2xl overflow-hidden">

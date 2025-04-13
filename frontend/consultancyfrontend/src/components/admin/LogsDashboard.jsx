@@ -2,76 +2,10 @@ import React, { useState, useMemo, useEffect } from "react";
 import { ChevronDown, Filter, Search } from "lucide-react";
 import { useSelector } from "react-redux";
 import { apiConnector } from "../../services/apiConnectors";
-
-// Sample log data
-const logs = [
-  {
-    id: 1,
-    projectId: 22,
-    form: "consult",
-    action: "INSERT",
-    createdBy: "u23cs021@coed.svnit.ac.in",
-    createdAt: "2025-03-26 18:43:19",
-    description: null,
-  },
-  {
-    id: 2,
-    projectId: 23,
-    form: "consult",
-    action: "INSERT",
-    createdBy: "u23cs021@coed.svnit.ac.in",
-    createdAt: "2025-03-26 18:50:16",
-    description: null,
-  },
-  {
-    id: 3,
-    projectId: 23,
-    form: "consult",
-    action: "UPDATE",
-    createdBy: "u23cs030@coed.svnit.ac.in",
-    createdAt: "2025-03-26 19:29:43",
-    description: "HOD has accepted project 23",
-  },
-  {
-    id: 4,
-    projectId: 10,
-    form: "work",
-    action: "UPDATE",
-    createdBy: "u23cs030@coed.svnit.ac.in",
-    createdAt: "2025-03-26 19:48:14",
-    description: "HOD has accepted project 10",
-  },
-  {
-    id: 5,
-    projectId: 10,
-    form: "work",
-    action: "UPDATE",
-    createdBy: "u23cs059@coed.svnit.ac.in",
-    createdAt: "2025-03-26 19:50:17",
-    description: "DEAN has accepted project 10",
-  },
-  {
-    id: 6,
-    projectId: 23,
-    form: "work",
-    action: "UPDATE",
-    createdBy: "u23cs030@coed.svnit.ac.in",
-    createdAt: "2025-03-26 19:53:13",
-    description: "HOD has accepted project 23",
-  },
-  {
-    id: 7,
-    projectId: 24,
-    form: "consult",
-    action: "INSERT",
-    createdBy: "u23cs021@coed.svnit.ac.in",
-    createdAt: "2025-03-27 13:46:43",
-    description: "",
-  },
-];
-
+import Spinner from "../spinner/Spinner";
 const LogsDashboard = () => {
   // State for filters
+  const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [projectId, setProjectId] = useState(0);
@@ -81,21 +15,30 @@ const LogsDashboard = () => {
   const { token } = useSelector((state) => state.auth);
   useEffect(() => {
     async function fetchLogs() {
-      const response = await apiConnector(
-        "POST",
-        `/admin/logs`,
-        {},
-        {
-          Authorization: `Bearer ${token}`,
-        }
-      );
-      console.log(response);
-      setLogs(response.data.data);
+      try {
+        setLoading(true);
+        const response = await apiConnector(
+          "POST",
+          `/admin/logs`,
+          {},
+          {
+            Authorization: `Bearer ${token}`,
+          }
+        );
+        console.log(response);
+        setLogs(response.data.data);
+        setLoading(false);
+      } catch (err) {
+        console.log(err, "in fetching logs");
+        setLoading(false);
+      }
+      setLoading(false);
     }
     fetchLogs();
   }, []);
 
   async function handleFilter() {
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.set("startDate", startDate);
@@ -111,7 +54,12 @@ const LogsDashboard = () => {
       setLogs(response.data.data);
     } catch (error) {
       console.error("Error fetching logs:", error);
+      setLoading(false);
     }
+    setLoading(false);
+  }
+  if (loading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
   }
 
   return (

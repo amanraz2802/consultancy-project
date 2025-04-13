@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { apiConnector } from "../../services/apiConnectors";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Spinner from "../spinner/Spinner";
 
 const ReceiptVoucherForm = () => {
   function generateCustomId() {
@@ -39,14 +40,19 @@ const ReceiptVoucherForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = apiConnector("POST", "/form/voucherForm", formData, {
-        draft: "false",
-        Authorization: `Bearer ${token}`,
-      });
+      const response = await apiConnector(
+        "POST",
+        "/form/voucherForm",
+        formData,
+        {
+          draft: "false",
+          Authorization: `Bearer ${token}`,
+        }
+      );
       console.log(response);
       if (response) {
         toast.success("Receipt Voucher generated successfully");
@@ -221,6 +227,7 @@ const ReceiptVoucherForm = () => {
     }
   };
   if (loading) {
+    return <Spinner text={"Submitting form..."} />;
   }
   return (
     <div className="container mx-auto p-6 max-w-4xl">

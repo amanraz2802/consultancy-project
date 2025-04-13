@@ -44,15 +44,22 @@ import ReceiptVoucherForm from "./components/forms/ReceiptVoucherForm.jsx";
 import VoucherView from "./components/viewform/Voucher.jsx";
 import ReceiptVoucherViewForm from "./components/disabledForm/VoucherFormView.jsx";
 import LogsDashboard from "./components/admin/LogsDashboard.jsx";
+import DistributionForm from "./components/forms/DistributionForm.jsx";
+import WorkOrderView from "./components/viewform/Workorder";
+import ClosureView from "./components/viewform/Closure.jsx";
+import ConsultancyProjectCompletionReportView from "./components/disabledForm/ConsultancyProjectCompletionReportView.jsx";
+import DistributionView from "./components/viewform/DistributionView.jsx";
+import PaymentViewForm from "./components/disabledForm/PaymentFormView.jsx";
+import DistributionViewForm from "./components/disabledForm/DistributionFormView.jsx";
 function App() {
   const { token, role } = useSelector((state) => state.auth);
   return (
     <>
-      <>
-        {/* <Homepage /> */}
-        {/* <Loginpage /> */}
-        {/* <ProjectTable /> */}
-        {/* <ConsultancyProjectRegistrationForm />
+      {/* <> */}
+      {/* <Homepage /> */}
+      {/* <Loginpage /> */}
+      {/* <ProjectTable /> */}
+      {/* <ConsultancyProjectRegistrationForm />
       <BillOfSupply />
       <ChequeDepositForm />
       <ConsultancyProjectCompletionReport />
@@ -60,11 +67,13 @@ function App() {
       <PaymentReceiptForm />
       <WorkOrderFormPage />
       <InvoiceForm /> */}
-        {/* <ProjectTable /> */}
-        {/* <ConsentForm /> */}
-      </>
+      {/* <ProjectTable /> */}
+      {/* <ConsentForm /> */}
+      {/* </> */}
       {/* <PaymentReceiptForm /> */}
       {/* <BillOfSupply /> */}
+      {/* <DistributionForm /> */}
+      {/* <ConsultancyProjectCompletionReport /> */}
       <Routes>
         <Route path="/" element={<IndexRoute />} />
         <Route path="/login" element={<Loginpage />} />
@@ -140,7 +149,6 @@ function App() {
             </OpenRoute>
           }
         />
-
         <Route
           path="create/consent-form/:projectId"
           element={
@@ -165,7 +173,6 @@ function App() {
             </OpenRoute>
           }
         />
-
         {/* ==========================Work-order routes============================ */}
         <Route
           path="work-order"
@@ -190,7 +197,6 @@ function App() {
             </OpenRoute>
           }
         />
-
         <Route
           path="/view/work-order/:projectId"
           element={
@@ -227,7 +233,6 @@ function App() {
             </OpenRoute>
           }
         />
-
         <Route
           path="/view/bill-supply/:projectId"
           element={
@@ -264,7 +269,6 @@ function App() {
             </OpenRoute>
           }
         />
-
         <Route
           path="/view/payment-detail/:projectId"
           element={
@@ -272,7 +276,7 @@ function App() {
               {" "}
               <ReusableComponent
                 title="Payment Detail View"
-                element={<BillFormView />}
+                element={<PaymentViewForm />}
               />
             </OpenRoute>
           }
@@ -301,12 +305,83 @@ function App() {
           }
         />
         <Route
+          path="closure"
+          element={
+            <OpenRoute>
+              <ReusableComponent
+                title="Projects: Closure"
+                element={<ClosureView />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="create/closure/:projectId"
+          element={
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Closure"
+                element={<ConsultancyProjectCompletionReport />}
+              />
+            </OpenRoute>
+          }
+        />
+
+        <Route
+          path="/view/closure/:projectId"
+          element={
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Closure Form View"
+                element={<ConsultancyProjectCompletionReportView />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
           path="view/voucher/:projectId"
           element={
             <OpenRoute>
               <ReusableComponent
                 title="Projects: Voucher"
                 element={<ReceiptVoucherViewForm />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="distribution"
+          element={
+            <OpenRoute>
+              <ReusableComponent
+                title="Projects: Distributions form"
+                element={<DistributionView />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="create/distribution/:projectId"
+          element={
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Distribution form: Create"
+                element={<DistributionForm />}
+              />
+            </OpenRoute>
+          }
+        />
+        <Route
+          path="view/distribution/:projectId"
+          element={
+            <OpenRoute>
+              {" "}
+              <ReusableComponent
+                title="Distribution form: View"
+                element={<DistributionViewForm />}
               />
             </OpenRoute>
           }
@@ -320,7 +395,16 @@ function App() {
             </AdminRoute>
           }
         />
-
+        <Route
+          path="admin/view/project/:projectId"
+          element={
+            <AdminRoute>
+              <AdminDashboard title="Project details">
+                <SingleProjectView />
+              </AdminDashboard>
+            </AdminRoute>
+          }
+        />
         <Route
           path="/admin/userManagement"
           element={
@@ -331,35 +415,62 @@ function App() {
             </AdminRoute>
           }
         />
-
         <Route
           path="/admin/consentForms"
           element={
             <AdminRoute>
               <AdminDashboard title="Consent Forms">
-                <FormSearch formType="consult" />
+                <FormSearch formType="consult" formTypeF="consent-form" />
               </AdminDashboard>
             </AdminRoute>
           }
         />
-
+        <Route
+          path="/admin/view/consent-form/:projectId"
+          element={
+            <AdminRoute>
+              <AdminDashboard title="Work Order View">
+                <ConsentFormView />
+              </AdminDashboard>
+            </AdminRoute>
+          }
+        />
         <Route
           path="/admin/workOrders"
           element={
             <AdminRoute>
               <AdminDashboard title="Work Orders">
-                <FormSearch formType="work" />
+                <FormSearch formType="work" formTypeF="work-order" />
               </AdminDashboard>
             </AdminRoute>
           }
         />
-
+        <Route
+          path="/admin/view/work-order/:projectId"
+          element={
+            <AdminRoute>
+              <AdminDashboard title="Work Order View">
+                <WorkFormView />
+              </AdminDashboard>
+            </AdminRoute>
+          }
+        />
         <Route
           path="/admin/billOfSupply"
           element={
             <AdminRoute>
               <AdminDashboard title="Bill of Supply">
-                <FormSearch formType="bill" />
+                <FormSearch formType="bill" formTypeF="bill-supply" />
+              </AdminDashboard>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/view/bill-supply/:projectId"
+          element={
+            <AdminRoute>
+              <AdminDashboard title="Bill of Supply View">
+                <BillFormView />
               </AdminDashboard>
             </AdminRoute>
           }
@@ -375,7 +486,16 @@ function App() {
             </AdminRoute>
           }
         />
-
+        <Route
+          path="/admin/view/payment-detail/:projectId"
+          element={
+            <AdminRoute>
+              <AdminDashboard title="Payment Details View">
+                <PaymentReceiptForm />
+              </AdminDashboard>
+            </AdminRoute>
+          }
+        />
         <Route
           path="/admin/vouchers"
           element={
@@ -386,7 +506,6 @@ function App() {
             </AdminRoute>
           }
         />
-
         <Route
           path="/admin/closureForms"
           element={
@@ -397,7 +516,6 @@ function App() {
             </AdminRoute>
           }
         />
-
         <Route
           path="/admin/contacts"
           element={
@@ -408,7 +526,6 @@ function App() {
             </AdminRoute>
           }
         />
-
         <Route
           path="/admin/projects"
           element={

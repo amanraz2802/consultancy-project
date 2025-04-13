@@ -8,6 +8,7 @@ import {
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import Spinner from "../spinner/Spinner";
 
 const ContactSection = () => {
   // Mock data for contact messages
@@ -18,38 +19,51 @@ const ContactSection = () => {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [reply, setReply] = useState("");
   const [filter, setFilter] = useState("all");
-  if (loading) {
-    return <Spinner text={"Please wait a moment..."} />;
-  }
+  // if (loading) {
+  //   return <Spinner text={"Please wait a moment..."} />;
+  // }
   useEffect(() => {
-    setLoading(true);
+    // setLoading(true);
     async function fetchMessages() {
-      const response = await apiConnector(
-        "GET",
-        "/admin/complains",
-        {},
-        {
-          Authorization: `Bearer ${token}`,
-        }
-      );
-      setMessages(response.data.data);
-      //   console.log(response);
+      setLoading(true);
+      try {
+        const response = await apiConnector(
+          "GET",
+          "/admin/complains",
+          {},
+          {
+            Authorization: `Bearer ${token}`,
+          }
+        );
+        setMessages(response.data.data);
+        //   console.log(response);
+      } catch (err) {
+        console.log(err, "in fetching contact");
+        setLoading(false);
+      }
+      setLoading(false);
     }
     fetchMessages();
     setLoading(false);
   }, []);
   async function handleStatusChange(complainId, newStatus) {
     setLoading(true);
-    const response = await apiConnector(
-      "POST",
-      `/admin/complain/${complainId}/${newStatus}`,
-      {},
-      {
-        Authorization: `Bearer ${token}`,
+    try {
+      const response = await apiConnector(
+        "POST",
+        `/admin/complain/${complainId}/${newStatus}`,
+        {},
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      if (response) {
+        toast.success(response.data.message);
       }
-    );
-    if (response) {
-      toast.success(response.data.message);
+    } catch (err) {
+      console.log(err, "handle change status");
+      toast.error("Action failed");
+      setLoading(false);
     }
     setLoading(false);
     // console.log(response);
@@ -64,13 +78,20 @@ const ContactSection = () => {
   async function handleSendReply(id, message) {
     setLoading(true);
     const formdata = { complainId: id.toString(), response: message };
-    const response = await apiConnector("POST", "/admin/complain", formdata, {
-      Authorization: `Bearer ${token}`,
-    });
-    if (response) {
-      toast.success(response.data.message);
+
+    try {
+      const response = await apiConnector("POST", "/admin/complain", formdata, {
+        Authorization: `Bearer ${token}`,
+      });
+      if (response) {
+        toast.success(response.data.message);
+      }
+      handleStatusChange(id, "resolve");
+    } catch (err) {
+      console.log(err, "handle send reply");
+      setLoading(false);
+      setEmailModal(false);
     }
-    handleStatusChange(id, "resolve");
     // console.log(response);
     setEmailModal(false);
     setLoading(false);
@@ -80,6 +101,10 @@ const ContactSection = () => {
     filter === "all"
       ? messages
       : messages.filter((msg) => msg.status === filter);
+
+  if (loading) {
+    return <Spinner text={"One moment, please.."} />;
+  }
 
   return (
     <div className="space-y-6">

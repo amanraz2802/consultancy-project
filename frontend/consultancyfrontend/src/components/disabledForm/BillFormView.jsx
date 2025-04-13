@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import Spinner from "../spinner/Spinner";
 
 const BillFormView = () => {
   const { projectId } = useParams();
@@ -45,6 +46,7 @@ const BillFormView = () => {
 
   useEffect(() => {
     const fetchBillDetails = async () => {
+      setIsLoading(true);
       try {
         const response = await apiConnector(
           "GET",
@@ -128,11 +130,7 @@ const BillFormView = () => {
   const totals = calculateTotals();
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p>Loading bill details...</p>
-      </div>
-    );
+    return <Spinner text={"Preparing your dashboard..."} />;
   }
 
   return (

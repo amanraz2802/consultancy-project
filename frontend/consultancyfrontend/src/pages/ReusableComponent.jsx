@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import { apiConnector } from "../services/apiConnectors.jsx";
 import { useSelector } from "react-redux";
 import { MdContactMail, MdReportProblem } from "react-icons/md";
+import { FaArrowCircleLeft, FaArrowCircleRight } from "react-icons/fa";
 // import { useNavigate } from "react-router-dom";
 
 function ReusableComponent(props) {
@@ -105,27 +106,6 @@ function ReusableComponent(props) {
           </div>
 
           <div className="group relative mb-4">
-            {/* <FaCircleUser className="w-8 h-8 lg:w-10 lg:h-10 text-white" />
-            <div className="absolute left-full bottom-0 opacity-0 bg-[#1f2048] text-white rounded-md z-50 transition-opacity duration-300 group-hover:opacity-100 ml-2">
-              <ul className="flex flex-col whitespace-nowrap">
-                <li className="p-2 gap-2 text-sm lg:text-base rounded flex items-center">
-                  <FaEdit className="w-5 h-5" />
-                  Change Password
-                </li>
-                <li className="border border-gray-600"></li>
-
-                <li
-                  className="flex gap-2 p-2 rounded text-sm lg:text-base items-center"
-                  onClick={() => {
-                    dispatch(logout());
-                    navigate("/login");
-                  }}
-                >
-                  <LuLogOut className="w-5 h-5" />
-                  Logout
-                </li>
-              </ul>
-            </div> */}
             <div
               className="flex gap-2 p-2  text-sm lg:text-base items-center rounded-xl bg-[#1f2048] "
               onClick={() => {
@@ -144,6 +124,24 @@ function ReusableComponent(props) {
           <div className="bg-[#efefef] h-full rounded-xl  shadow-lg">
             <div className="bg-white border-8 font-extrabold border-[#efefef] rounded-3xl p-6  text-4xl font-poppins ">
               {props.title === "" ? formatText(formname) : props.title}
+              <div
+                className="absolute right-24 top-12   rounded-lg  text-[24px]"
+                onClick={() => {
+                  navigate(-1);
+                }}
+                title="Back"
+              >
+                <FaArrowCircleLeft size={40} color="#1f2048" />
+              </div>
+              <div
+                className="absolute right-12 top-12   rounded-lg  text-[24px]"
+                onClick={() => {
+                  navigate(1);
+                }}
+                title="Next"
+              >
+                <FaArrowCircleRight size={40} color="#1f2048" />
+              </div>
             </div>
             {/* <Dashboard /> */}
             {props.element}

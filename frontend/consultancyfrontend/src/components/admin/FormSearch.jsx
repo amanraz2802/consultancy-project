@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { FaSearch, FaEye, FaEdit, FaDownload } from "react-icons/fa";
 import { apiConnector } from "../../services/apiConnectors";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Spinner from "../spinner/Spinner";
 
-const FormSearch = ({ formType }) => {
+const FormSearch = ({ formType, formTypeF }) => {
+  const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
   const [projectId, setProjectId] = useState("");
   const [showAllForms, setShowAllForms] = useState(true);
@@ -59,7 +62,9 @@ const FormSearch = ({ formType }) => {
     setProjectId("");
     setShowAllForms(true);
   };
-
+  if (loading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
+  }
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-md p-6">
@@ -140,20 +145,24 @@ const FormSearch = ({ formType }) => {
                           className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
                           title="View"
                         >
-                          <FaEye />
+                          <FaEye
+                            onClick={() => {
+                              navigate(`/admin/view/${formTypeF}/${form.id}`);
+                            }}
+                          />
                         </button>
-                        <button
+                        {/* <button
                           className="p-1 bg-green-100 text-green-600 rounded hover:bg-green-200"
                           title="Edit"
                         >
                           <FaEdit />
-                        </button>
-                        <button
+                        </button> */}
+                        {/* <button
                           className="p-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
                           title="Download"
                         >
                           <FaDownload />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>

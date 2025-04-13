@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import Spinner from "../spinner/Spinner";
 function ConsentFormView() {
   const [data, setData] = useState({});
   const [formdata, setFormData] = useState({
@@ -27,9 +28,11 @@ function ConsentFormView() {
   });
   const { projectId } = useParams();
   const { token } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         console.log(projectId);
         const response = await apiConnector(
@@ -67,7 +70,9 @@ function ConsentFormView() {
         console.log("Form Data: ", formdata);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoading(false);
       }
+      setLoading(false);
     };
 
     fetchData();
@@ -215,6 +220,10 @@ function ConsentFormView() {
       console.error("Error handling PDF:", error);
     }
   };
+
+  if (loading) {
+    return <Spinner text={"Preparing your dashboard..."} />;
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">

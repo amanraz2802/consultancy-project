@@ -292,10 +292,10 @@ const ConsentForm = () => {
     if (role === "DEAN") {
       // Separate sections for different statuses
       const pendingForms = data.filter(
-        (project) => project.consentStatus === 3
+        (project) => project.consentStatus === 6
       );
       const acceptedForms = data.filter(
-        (project) => project.consentStatus === 4
+        (project) => project.consentStatus === 5
       );
       const rejectedForms = data.filter(
         (project) => project.consentStatus === 2
@@ -303,7 +303,7 @@ const ConsentForm = () => {
 
       const renderFormSection = (forms, title, statusColor) =>
         forms.length > 0 && (
-          <div className="mb-8">
+          <div className="mb-8 pl-4 pr-2">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
               {title}
             </h2>

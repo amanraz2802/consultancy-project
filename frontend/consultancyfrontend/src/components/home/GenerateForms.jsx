@@ -37,6 +37,7 @@ function GenerateForms() {
         );
         // console.log(response.data);
         // console.log(response.data.data);
+        console.log(response.data.data);
         setForms(response.data.data || {}); // Ensure forms is always an object
         // console.log(forms);
         // console.log(response);
@@ -48,21 +49,6 @@ function GenerateForms() {
     };
     fetchDashboard();
   }, [token]);
-
-  useEffect(() => {
-    async function fetchDummy() {
-      const response = await apiConnector(
-        "GET",
-        "/form/distributionForm/21",
-        {},
-        {
-          Authorization: `Bearer ${token}`,
-        }
-      );
-      console.log(response);
-    }
-    fetchDummy();
-  }, []);
 
   const colors = [
     "#eb5c76",

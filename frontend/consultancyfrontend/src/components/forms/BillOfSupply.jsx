@@ -443,7 +443,7 @@ const InvoiceForm = () => {
     } catch (err) {
       console.log(err);
       toast.error(
-        "Something went wrong. Please fill all the details correctly"
+        "Something went wrong. Please try again later"
       );
       setLoading(false);
     }

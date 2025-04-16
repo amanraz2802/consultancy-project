@@ -192,11 +192,11 @@ const ConsultancyProjectCompletionReport = () => {
       console.log(response);
       if (response.data) {
         toast.success("Form submitted successfully");
-        navigate("/home");
+        navigate("/closure");
       }
     } catch (err) {
       console.error("Error submitting closure form:", err);
-      toast.error("Failed to submit form");
+      toast.error("Something went wrong. Please try again later");
     } finally {
       setSubmitting(false);
     }

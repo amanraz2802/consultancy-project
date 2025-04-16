@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 const Notification = () => {
-  console.log("inside notification compo");
   // Dummy notification data with added type field
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -57,6 +56,7 @@ const Notification = () => {
     );
 
     console.log(response);
+    setTotal(response.data.pagination.totalPages);
   }
   // Function to mark a notification as read
   //   const markAsRead = (id) => {
@@ -70,14 +70,6 @@ const Notification = () => {
   //   };
 
   // Function to mark all notifications as read
-  const markAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        readStatus: 1,
-      }))
-    );
-  };
 
   // Get icon based on notification type
   const getIcon = (type) => {

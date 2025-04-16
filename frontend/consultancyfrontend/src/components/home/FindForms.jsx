@@ -124,7 +124,7 @@ function FindForms() {
       );
 
       setData(response.data.data);
-      setTotal(response.data.total);
+      setTotal(response.data.pagination.total);
       setLoading(false);
     } catch (error) {
       console.error("Error applying filters:", error);
@@ -335,7 +335,7 @@ function FindForms() {
             </div>
             {formOpen && (
               <div
-                className="absolute top-10 left-0 z-10 border-black rounded-xl border-[1px] w-[200%] flex flex-col justify-center items-center bg-white shadow-lg"
+                className="absolute top-10 left-0 z-10 border-black rounded-xl border-[1px] w-[100%] flex flex-col justify-center items-center bg-white shadow-lg"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div

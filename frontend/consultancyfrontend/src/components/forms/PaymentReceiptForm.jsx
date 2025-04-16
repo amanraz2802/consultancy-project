@@ -23,50 +23,59 @@ const PaymentReceiptForm = () => {
       "Are you sure you want to submit the form?"
     );
     setLoading(true);
-    if (confirmSubmit) {
-      // Submit the form data
-      console.log("Form Submitted:", formData);
-      // Send the updated formData to the backend
-      const response = await apiConnector(
-        "POST",
-        "/form/paymentForm",
-        formData,
-        { draft: "false", Authorization: `Bearer ${token}` }
-      );
-      console.log(response);
-      if (response) {
-        toast.success("Form submitteed successfully");
-        navigate("/home");
-      } else {
-        toast.error("Something went wrong. Please try again");
-      }
 
-      setFormData({
-        receiptNo: "",
-        date: "",
-        projectNo: projectId,
-        workName: "",
-        clientName: "",
-        pcName: "",
-        totalAmount: "",
-        previousAmount: "",
-        invoiceNo: "",
-        invoiceDate: "",
-        basicAmount: "",
-        cgst: "",
-        sgst: "",
-        igst: "",
-        tds: "",
-        tdsCgst: "",
-        tdsSgst: "",
-        tdsIgst: "",
-        securityDeposit: "",
-        retentionMoney: "",
-        otherDeductions: "",
-        paymentDate: "",
-        remark: "",
-      });
+    if (confirmSubmit) {
+      try {
+        // Submit the form data
+        console.log("Form Submitted:", formData);
+
+        // Send the updated formData to the backend
+        const response = await apiConnector(
+          "POST",
+          "/form/paymentForm",
+          formData,
+          { draft: "false", Authorization: `Bearer ${token}` }
+        );
+
+        console.log(response);
+        if (response) {
+          toast.success("Form submitteed successfully");
+          navigate("/payment-detail");
+        } else {
+          toast.error("Something went wrong. Please try again");
+        }
+
+        setFormData({
+          receiptNo: "",
+          date: "",
+          projectNo: projectId,
+          workName: "",
+          clientName: "",
+          pcName: "",
+          totalAmount: "",
+          previousAmount: "",
+          invoiceNo: "",
+          invoiceDate: "",
+          basicAmount: "",
+          cgst: "",
+          sgst: "",
+          igst: "",
+          tds: "",
+          tdsCgst: "",
+          tdsSgst: "",
+          tdsIgst: "",
+          securityDeposit: "",
+          retentionMoney: "",
+          otherDeductions: "",
+          paymentDate: "",
+          remark: "",
+        });
+      } catch (error) {
+        console.error("Submission Error:", error);
+        toast.error("An error occurred while submitting the form");
+      }
     }
+
     setLoading(false);
   };
 

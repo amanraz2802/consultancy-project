@@ -167,6 +167,7 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
         // alert("Form submitted successfully!");
       } catch (err) {
         setLoading(false);
+        toast.error("Something went wrong. Please try again later");
         console.log("error in consultancy registration", err);
       }
     }
@@ -222,11 +223,11 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
           proposedLetterNo: "",
         });
         setLoading(false);
-        navigate("/home");
+        navigate("/consent-form");
       } catch (error) {
         console.error("Error saving draft:", error.response);
         setLoading(false);
-        alert("There was an error saving the draft. Please try again.");
+        toast.error("There was an error saving the draft. Please try again.");
       }
     }
   };

@@ -96,11 +96,11 @@ const DistributionForm = () => {
       console.log(response);
       if (response.data) {
         toast.success("Form submitted successfully");
-        navigate("/home");
+        navigate("/distribution");
       }
     } catch (err) {
       console.error("Error submitting closure form:", err);
-      toast.error("Failed to submit form");
+      toast.error("Something went wrong. Please try again later");
       setLoading(false);
     }
     setLoading(false);

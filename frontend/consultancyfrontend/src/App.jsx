@@ -73,6 +73,7 @@ function App() {
       {/* <PaymentReceiptForm /> */}
       {/* <BillOfSupply /> */}
       {/* <DistributionForm /> */}
+      {/* <DistributionView /> */}
       {/* <ConsultancyProjectCompletionReport /> */}
       <Routes>
         <Route path="/" element={<IndexRoute />} />

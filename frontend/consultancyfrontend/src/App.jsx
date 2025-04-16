@@ -51,6 +51,7 @@ import ConsultancyProjectCompletionReportView from "./components/disabledForm/Co
 import DistributionView from "./components/viewform/DistributionView.jsx";
 import PaymentViewForm from "./components/disabledForm/PaymentFormView.jsx";
 import DistributionViewForm from "./components/disabledForm/DistributionFormView.jsx";
+import BillView from "./components/viewform/Bill.jsx";
 function App() {
   const { token, role } = useSelector((state) => state.auth);
   return (
@@ -217,7 +218,7 @@ function App() {
             <OpenRoute>
               <ReusableComponent
                 title="Projects: Bill of Supply"
-                element={<Bill />}
+                element={<BillView />}
               />
             </OpenRoute>
           }

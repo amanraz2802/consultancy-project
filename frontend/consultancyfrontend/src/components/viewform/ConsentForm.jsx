@@ -85,6 +85,8 @@ const ConsentForm = () => {
       }
       setRemarks("");
     } catch (error) {
+      setApprovalModal(false);
+      setSelectedForm(null);
       console.error("Error in approval action:", error);
       toast.error("Reviewed failed");
       setIsLoading(false);

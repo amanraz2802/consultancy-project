@@ -10,7 +10,10 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
   const navigate = useNavigate();
   const { projectId } = useParams();
   const { token, email } = useSelector((state) => state.auth);
-  console.log("email=", email);
+
+  // Add state for validation errors
+  const [validationErrors, setValidationErrors] = useState([]);
+
   const formatDate = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
@@ -18,6 +21,7 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
     const year = d.getFullYear();
     return `${day}/${month}/${year}`;
   };
+
   const date = new Date();
   const { formId } = useParams();
   const [data, setData] = useState({});
@@ -41,7 +45,9 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
     estimateLetterNo: "",
     proposedLetterNo: "",
   });
+
   const [loading1, setLoading1] = useState(false);
+
   {
     projectId &&
       useEffect(() => {
@@ -70,9 +76,11 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
         }
       }, [projectId]);
   }
+
   if (loading1) {
     return <Spinner text={"Preparing your dashboard..."} />;
   }
+
   // Update formData whenever data changes
   useEffect(() => {
     if (data) {
@@ -97,12 +105,18 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
       });
     }
   }, [data]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+
+    // Clear validation error for this field when user types
+    setValidationErrors((prev) =>
+      prev.filter((error) => error.path[0] !== name)
+    );
   };
 
   const handleRadioChange = (event) => {
@@ -112,6 +126,9 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Clear previous validation errors
+    setValidationErrors([]);
+
     const confirmSubmit = window.confirm(
       "Are you sure you want to submit the form?"
     );
@@ -120,10 +137,8 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
       const form = {
         ...formData,
         assignmentTypes: selectedOption,
-
-        // to: "hod@svnit.ac.in",
       };
-      console.log(form);
+
       setLoading(true);
       try {
         console.log(form, "consent form data");
@@ -133,47 +148,55 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
           JSON.stringify(form),
           { draft: "false", Authorization: `Bearer ${token}` }
         );
-        console.log(response);
-        if (response.status === 200) toast.success("Submitted successfully");
-        // if (!response.ok) {
-        //   return toast.error(`HTTP error! Status: ${response.status}`);
-        // }
 
-        // const result = await response.json();
-        // console.log("Success:", result);
-        // handleDownloadPDF(formData);
-        // Reset the form data
-        setFormData({
-          projectId: "",
-          date: date.toISOString().split("T")[0],
-          principalFacultyName: "",
-          associatedFacultyNames: "",
-          consultancyTitle: "",
-          firmName: "",
-          firmEmail: "",
-          firmPhone: "",
-          assignmentTypes: "",
-          natureOfWork: "",
-          estimatedDuration: "",
-          outOfCampusVisits: "",
-          commencementDate: "",
-          totalAmount: "",
-          workOrderNo: "",
-          estimateLetterNo: "",
-          proposedLetterNo: "",
-        });
-        setLoading(false);
-        navigate("/home");
-        // alert("Form submitted successfully!");
+        console.log(response);
+        if (response.status === 201) {
+          toast.success("Submitted successfully");
+
+          // Reset the form data
+          setFormData({
+            projectId: "",
+            date: date.toISOString().split("T")[0],
+            principalFacultyName: "",
+            associatedFacultyNames: "",
+            consultancyTitle: "",
+            firmName: "",
+            firmEmail: "",
+            firmPhone: "",
+            assignmentTypes: "",
+            natureOfWork: "",
+            estimatedDuration: "",
+            outOfCampusVisits: "",
+            commencementDate: "",
+            totalAmount: "",
+            workOrderNo: "",
+            estimateLetterNo: "",
+            proposedLetterNo: "",
+          });
+
+          navigate("/home");
+        }
       } catch (err) {
         setLoading(false);
-        toast.error("Something went wrong. Please try again later");
+
+        // Handle validation errors
+        if (err.response && err.response.data && err.response.data.error) {
+          setValidationErrors(err.response.data.error);
+          toast.error("Validation error. Please check the form and try again.");
+        } else {
+          toast.error("Something went wrong. Please try again later");
+        }
         console.log("error in consultancy registration", err);
       }
+      setLoading(false);
     }
   };
+
   const handleDraft = async (event) => {
     event.preventDefault();
+
+    // Clear previous validation errors
+    setValidationErrors([]);
 
     const confirmDraft = window.confirm(
       "Are you sure you want to save this as a draft?"
@@ -184,7 +207,7 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
         ...formData,
         assignmentTypes: selectedOption,
       };
-      console.log(draftForm);
+
       setLoading(true);
       try {
         const response = await apiConnector(
@@ -193,16 +216,10 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
           JSON.stringify(draftForm),
           { draft: "true", Authorization: `Bearer ${token}` }
         );
+
         console.log(response);
-        // if (!response.ok) {
-        //   throw new Error(`HTTP error! Status: ${response.status}`);
-        // }
-
-        // const result = await response.json();
-        // console.log(result);
-        // console.log("Draft saved successfully:", result);
-
         toast.success("Draft saved successfully!");
+
         setFormData({
           projectId: "",
           date: date.toISOString().split("T")[0],
@@ -222,23 +239,82 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
           estimateLetterNo: "",
           proposedLetterNo: "",
         });
-        setLoading(false);
+
         navigate("/consent-form");
       } catch (error) {
-        console.error("Error saving draft:", error.response);
         setLoading(false);
-        toast.error("There was an error saving the draft. Please try again.");
+
+        // Handle validation errors for draft too
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error
+        ) {
+          setValidationErrors(error.response.data.error);
+          toast.error(
+            "Validation error. Please check the form before saving as draft."
+          );
+        } else {
+          toast.error("There was an error saving the draft. Please try again.");
+        }
+        console.error("Error saving draft:", error.response);
       }
+      setLoading(false);
     }
   };
+
+  // Helper function to check if a field has validation errors
+  const hasError = (fieldName) => {
+    return validationErrors.some((error) => error.path[0] === fieldName);
+  };
+
+  // Helper function to get error message for a field
+  const getErrorMessage = (fieldName) => {
+    const error = validationErrors.find((error) => error.path[0] === fieldName);
+    return error ? error.message : "";
+  };
+
   if (loading) {
     return <Spinner text="Submitting form..." />;
   }
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      {/* <div className="bg-white border-8 border-[#efefef] font-extrabold rounded-3xl p-6  text-3xl font-poppins ">
-        Consent Form
-      </div> */}
+      {/* Display validation errors at the top if any */}
+      {validationErrors.length > 0 && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg
+                className="h-5 w-5 text-red-500"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">
+                Please fix the following errors:
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <ul className="list-disc pl-5 space-y-1">
+                  {validationErrors.map((error, index) => (
+                    <li key={index}>
+                      {error.path[0]}: {error.message}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="max-w-6xl mx-auto p-4 relative">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
@@ -269,6 +345,7 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
           consultancy work, for onwards submission through the HOD)
         </p>
       </header>
+
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="text-gray-800 font-semibold text-base mb-4 flex justify-between">
           <span>
@@ -283,35 +360,12 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
               onChange={handleInputChange}
               disabled
             />
-            {/* <span>/</span>
-            <input
-              type="number"
-              className="border border-gray-300 rounded px-2 py-1 w-14 mx-2"
-              min="0"
-              max="99"
-              placeholder="24"
-              name="year1"
-              value={formData.year1}
-              onChange={handleInputChange}
-            />
-            <span>-</span>
-            <input
-              type="number"
-              className="border border-gray-300 rounded px-2 py-1 w-14 mx-2"
-              min="0"
-              max="99"
-              name="year2"
-              value={formData.year2}
-              onChange={handleInputChange}
-              placeholder="25"
-            /> */}
           </span>
           <span>
             <span className="ml-20"> Date: </span>
             <input
               type="text"
               name="date"
-              // value={formData.date}
               value={formatDate(new Date())}
               onChange={handleInputChange}
               className="border border-gray-300 rounded px-2 py-1 w-32 "
@@ -324,7 +378,6 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
           <div>
             <label className="block text-sm font-medium mb-1">
               1. Email of the Principal Faculty member
-              {/* & the affiliating department */}
             </label>
             <input
               type="text"
@@ -334,21 +387,32 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
               onChange={handleInputChange}
               className="w-full p-2 border rounded bg-"
             />
+            {hasError("principalFacultyName") && (
+              <p className="text-red-500 text-xs mt-1">
+                {getErrorMessage("principalFacultyName")}
+              </p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              2. Email of the Associated Faculty members
-              {/* & the affiliating department  */}
-              (if applicable) (if multiple separate by ',')
+              2. Email of the Associated Faculty members (if applicable) (if
+              multiple separate by ',')
             </label>
             <input
               type="text"
               name="associatedFacultyNames"
               value={formData.associatedFacultyNames}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className={`w-full p-2 border rounded ${
+                hasError("associatedFacultyNames") ? "border-red-500" : ""
+              }`}
             />
+            {hasError("associatedFacultyNames") && (
+              <p className="text-red-500 text-xs mt-1">
+                {getErrorMessage("associatedFacultyNames")}
+              </p>
+            )}
           </div>
 
           <div className="md:col-span-2">
@@ -360,8 +424,15 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
               name="consultancyTitle"
               value={formData.consultancyTitle}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className={`w-full p-2 border rounded ${
+                hasError("consultancyTitle") ? "border-red-500" : ""
+              }`}
             />
+            {hasError("consultancyTitle") && (
+              <p className="text-red-500 text-xs mt-1">
+                {getErrorMessage("consultancyTitle")}
+              </p>
+            )}
           </div>
 
           <div className="md:col-span-2">
@@ -369,7 +440,6 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
               4. Name, E-mail, & Phone No. of the Firm Soliciting Consultancy
               from SVNIT
             </label>
-            {/* <!-- Firm Name --> */}
             <div className="mb-4">
               <label
                 htmlFor="firmName"
@@ -383,11 +453,17 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
                 name="firmName"
                 value={formData.firmName}
                 onChange={handleInputChange}
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  hasError("firmName") ? "border-red-500" : ""
+                }`}
               />
+              {hasError("firmName") && (
+                <p className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("firmName")}
+                </p>
+              )}
             </div>
 
-            {/* <!-- Firm Email --> */}
             <div className="mb-4">
               <label
                 htmlFor="firmEmail"
@@ -401,11 +477,17 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
                 name="firmEmail"
                 value={formData.firmEmail}
                 onChange={handleInputChange}
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  hasError("firmEmail") ? "border-red-500" : ""
+                }`}
               />
+              {hasError("firmEmail") && (
+                <p className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("firmEmail")}
+                </p>
+              )}
             </div>
 
-            {/* <!-- Firm Phone Number --> */}
             <div className="mb-4">
               <label
                 htmlFor="firmPhone"
@@ -419,8 +501,15 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
                 name="firmPhone"
                 value={formData.firmPhone}
                 onChange={handleInputChange}
-                className="w-full p-2 border rounded"
+                className={`w-full p-2 border rounded ${
+                  hasError("firmPhone") ? "border-red-500" : ""
+                }`}
               />
+              {hasError("firmPhone") && (
+                <p className="text-red-500 text-xs mt-1">
+                  {getErrorMessage("firmPhone")}
+                </p>
+              )}
             </div>
           </div>
 
@@ -493,9 +582,14 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
                   className="form-checkbox"
                   checked={selectedOption === "Others"}
                 />
+                <span className="ml-2">Others</span>
               </label>
-              <span className="ml-2">Others</span>
             </div>
+            {hasError("assignmentTypes") && (
+              <p className="text-red-500 text-xs mt-1">
+                {getErrorMessage("assignmentTypes")}
+              </p>
+            )}
           </div>
 
           <div>
@@ -526,19 +620,31 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
                 <span className="ml-2">Not Confidential</span>
               </label>
             </div>
+            {hasError("natureOfWork") && (
+              <p className="text-red-500 text-xs mt-1">
+                {getErrorMessage("natureOfWork")}
+              </p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              7a. Estimated Duration of Project(in month)
+              7a. Estimated Duration of Project (in months)
             </label>
             <input
               type="text"
               name="estimatedDuration"
               value={formData.estimatedDuration}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className={`w-full p-2 border rounded ${
+                hasError("estimatedDuration") ? "border-red-500" : ""
+              }`}
             />
+            {hasError("estimatedDuration") && (
+              <p className="text-red-500 text-xs mt-1">
+                {getErrorMessage("estimatedDuration")}
+              </p>
+            )}
           </div>
 
           <div>
@@ -550,8 +656,15 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
               name="outOfCampusVisits"
               value={formData.outOfCampusVisits}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className={`w-full p-2 border rounded ${
+                hasError("outOfCampusVisits") ? "border-red-500" : ""
+              }`}
             />
+            {hasError("outOfCampusVisits") && (
+              <p className="text-red-500 text-xs mt-1">
+                {getErrorMessage("outOfCampusVisits")}
+              </p>
+            )}
           </div>
 
           <div>
@@ -563,8 +676,15 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
               name="commencementDate"
               value={formData.commencementDate}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className={`w-full p-2 border rounded ${
+                hasError("commencementDate") ? "border-red-500" : ""
+              }`}
             />
+            {hasError("commencementDate") && (
+              <p className="text-red-500 text-xs mt-1">
+                {getErrorMessage("commencementDate")}
+              </p>
+            )}
           </div>
 
           <div>
@@ -573,12 +693,19 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
             </label>
             <input
               type="number"
-              className="w-full p-2 border rounded"
+              className={`w-full p-2 border rounded ${
+                hasError("totalAmount") ? "border-red-500" : ""
+              }`}
               name="totalAmount"
               value={formData.totalAmount}
               onChange={handleInputChange}
               min="0"
             />
+            {hasError("totalAmount") && (
+              <p className="text-red-500 text-xs mt-1">
+                {getErrorMessage("totalAmount")}
+              </p>
+            )}
           </div>
 
           <div className="md:col-span-2">
@@ -593,8 +720,15 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
                   name="workOrderNo"
                   value={formData.workOrderNo}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
+                  className={`w-full p-2 border rounded ${
+                    hasError("workOrderNo") ? "border-red-500" : ""
+                  }`}
                 />
+                {hasError("workOrderNo") && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {getErrorMessage("workOrderNo")}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block">Estimate letter No.:</label>
@@ -603,8 +737,15 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
                   name="estimateLetterNo"
                   value={formData.estimateLetterNo}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
+                  className={`w-full p-2 border rounded ${
+                    hasError("estimateLetterNo") ? "border-red-500" : ""
+                  }`}
                 />
+                {hasError("estimateLetterNo") && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {getErrorMessage("estimateLetterNo")}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block">Proposed letter No.:</label>
@@ -613,8 +754,15 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
                   name="proposedLetterNo"
                   value={formData.proposedLetterNo}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
+                  className={`w-full p-2 border rounded ${
+                    hasError("proposedLetterNo") ? "border-red-500" : ""
+                  }`}
                 />
+                {hasError("proposedLetterNo") && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {getErrorMessage("proposedLetterNo")}
+                  </p>
+                )}
               </div>
             </div>
           </div>

@@ -86,6 +86,9 @@ const PaymentDetailView = () => {
       }
       setRemarks("");
     } catch (error) {
+      setApprovalModal(false);
+      setRemarks("");
+      setSelectedForm(null);
       console.error("Error in approval action:", error);
       toast.error("Review failed");
       setIsLoading(false);

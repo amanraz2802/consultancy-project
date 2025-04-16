@@ -67,6 +67,7 @@ const DistributionForm = () => {
     },
   ]);
 
+  function handleFileChange() {}
   async function submitHandler() {
     // console.log(body);
     // console.log(subject);
@@ -82,11 +83,12 @@ const DistributionForm = () => {
       obj[key] = value;
     });
     setLoading(true);
+    console.log(obj);
     try {
       const response = await apiConnector(
         "POST",
         "/form/distributionForm",
-        formData,
+        obj,
         {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -759,7 +761,7 @@ const DistributionForm = () => {
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="border p-2 text-left">Employee Code</th>
-                      <th className="border p-2 text-left">Title/ Name</th>
+                      <th className="border p-2 text-left">Title/ Email</th>
                       {
                         // section.id !== 2 && (
                         //   <th className="border p-2 text-left">Email</th>
@@ -863,6 +865,16 @@ const DistributionForm = () => {
             </button>
           </div>
         ))}
+      </div>
+      <div>
+        <label className="block text-lg font-semibold text-gray-700 mb-1">
+          Upload Bill Receipt
+        </label>
+        <input
+          type="file"
+          onChange={handleFileChange}
+          className="w-full px-3 mb-3 py-2 border border-gray-300 rounded-md shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:bg-blue-50 file:text-blue-400 hover:file:bg-blue-100"
+        />
       </div>
 
       <div className="flex space-x-4">

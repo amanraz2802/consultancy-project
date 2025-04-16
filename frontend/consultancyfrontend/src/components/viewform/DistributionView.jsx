@@ -69,14 +69,15 @@ const DistributionView = () => {
         }
       );
 
-      // Refresh data or update the item's status
-      setData((prev) =>
-        prev.map((item) =>
-          item.id === selectedForm.id
-            ? { ...item, distribution: action === "accept" ? 4 : 2 }
-            : item
-        )
-      );
+      // // Refresh data or update the item's status
+      // setData((prev) =>
+      //   prev.map((item) =>
+      //     item.id === selectedForm.id
+      //       ? { ...item, distribution: action === "accept" ? 4 : 2 }
+      //       : item
+      //   )
+      // );
+      location.reload();
       setApprovalModal(false);
       setSelectedForm(null);
       console.log(response);
@@ -85,6 +86,9 @@ const DistributionView = () => {
       }
       setRemarks("");
     } catch (error) {
+      setApprovalModal(false);
+      setSelectedForm(null);
+      setRemarks("");
       console.error("Error in approval action:", error);
       toast.error("Review failed");
       setIsLoading(false);

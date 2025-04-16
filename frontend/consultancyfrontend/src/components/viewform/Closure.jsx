@@ -70,13 +70,14 @@ const ClosureView = () => {
       );
 
       // Refresh data or update the item's status
-      setData((prev) =>
-        prev.map((item) =>
-          item.id === selectedForm.id
-            ? { ...item, closure: action === "accept" ? 4 : 2 }
-            : item
-        )
-      );
+      // setData((prev) =>
+      //   prev.map((item) =>
+      //     item.id === selectedForm.id
+      //       ? { ...item, closure: action === "accept" ? 4 : 2 }
+      //       : item
+      //   )
+      // );
+      location.reload();
       setApprovalModal(false);
       setSelectedForm(null);
       console.log(response);
@@ -85,6 +86,9 @@ const ClosureView = () => {
       }
       setRemarks("");
     } catch (error) {
+      setRemarks("");
+      setApprovalModal(false);
+      setSelectedForm(null);
       console.error("Error in approval action:", error);
       toast.error("Review failed");
       setIsLoading(false);

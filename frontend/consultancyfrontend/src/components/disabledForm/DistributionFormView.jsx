@@ -34,7 +34,7 @@ const DistributionViewForm = () => {
         );
 
         console.log(response.data, "distribution form");
-        const formData = response.data.distributionForm;
+        const formData = response.data.data;
 
         if (formData) {
           setFormData(formData);

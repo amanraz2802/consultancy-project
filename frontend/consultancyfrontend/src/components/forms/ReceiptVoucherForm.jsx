@@ -56,7 +56,7 @@ const ReceiptVoucherForm = () => {
       console.log(response);
       if (response) {
         toast.success("Receipt Voucher generated successfully");
-        navigate("/voucher");
+        navigate("/payment-detail");
       }
 
       setSubmittedData(formData);

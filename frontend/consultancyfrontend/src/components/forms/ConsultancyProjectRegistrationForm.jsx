@@ -530,7 +530,7 @@ const ConsultancyProjectRegistrationForm = ({ view }) => {
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              7a. Estimated Duration of Project
+              7a. Estimated Duration of Project(in month)
             </label>
             <input
               type="text"

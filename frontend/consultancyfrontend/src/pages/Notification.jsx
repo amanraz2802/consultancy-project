@@ -136,7 +136,7 @@ const Notification = () => {
                   </div>
                   <div
                     onClick={() => {
-                      navigate(notification.linkTo);
+                      navigate(`/view/${notification.linkTo}`);
                     }}
                     className="text-blue-600 hover:text-blue-800 text-xs mt-1 inline-block"
                   >

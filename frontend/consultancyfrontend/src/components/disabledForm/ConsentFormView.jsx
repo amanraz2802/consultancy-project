@@ -191,7 +191,11 @@ function ConsentFormView() {
       yPosition -= lineHeight;
       drawField("Nature of Work:", formData.natureOfWork, yPosition);
       yPosition -= lineHeight;
-      drawField("Estimated Duration:", formData.estimatedDuration, yPosition);
+      drawField(
+        "Estimated Duration (in month):",
+        formData.estimatedDuration,
+        yPosition
+      );
       yPosition -= lineHeight;
       drawField("Out of Campus Visits:", formData.outOfCampusVisits, yPosition);
       yPosition -= lineHeight;
@@ -526,7 +530,7 @@ function ConsentFormView() {
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              7a. Estimated Duration of Project
+              7a. Estimated Duration of Project (in month)
             </label>
             <input
               type="text"
